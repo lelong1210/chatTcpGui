@@ -20,18 +20,18 @@ public class Chat_Body extends javax.swing.JPanel {
         sp.getVerticalScrollBar().setBackground(Color.WHITE);
     }
 
-    public void addItemLeft(String text) {
+    public void addItemLeft(String text,String time) {
         Chat_Left item = new Chat_Left();
-        item.setText(text);
+        item.setText(text,time);
         body.add(item, "wrap, w ::80%");
         //  ::80% set max with 80%
         body.repaint();
         body.revalidate();
     }
 
-    public void addItemRight(String text) {
+    public void addItemRight(String text,String time) {
         Chat_Right item = new Chat_Right();
-        item.setText(text);
+        item.setText(text,time);;
         body.add(item, "wrap, al right, w ::80%");
         //  ::80% set max with 80%
         body.repaint();

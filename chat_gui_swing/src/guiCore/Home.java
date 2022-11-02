@@ -7,6 +7,7 @@ public class Home extends javax.swing.JLayeredPane {
 	private static final long serialVersionUID = 1L;
 
 	private Chat chat;
+	private Menu_Left menu_Left;
 	
 	
     public Home() {
@@ -16,15 +17,23 @@ public class Home extends javax.swing.JLayeredPane {
 
     private void init() {
     	this.chat = new Chat();
-    	
+    	this.menu_Left = new Menu_Left();
     	
         setLayout(new MigLayout("fillx, filly", "0[200!]5[fill, 100%]5[200!]0", "0[fill]0"));
-        this.add(new Menu_Left());
+        this.add(this.menu_Left);
         this.add(this.chat);
         this.add(new Menu_Right());
     }
 
-    public Chat getChat() {
+    public Menu_Left getMenu_Left() {
+		return menu_Left;
+	}
+
+	public void setMenu_Left(Menu_Left menu_Left) {
+		this.menu_Left = menu_Left;
+	}
+
+	public Chat getChat() {
 		return chat;
 	}
 

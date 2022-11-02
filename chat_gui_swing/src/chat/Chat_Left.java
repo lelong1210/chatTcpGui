@@ -9,9 +9,9 @@ public class Chat_Left extends javax.swing.JLayeredPane {
         txt.setBackground(new Color(242, 242, 242));
     }
 
-    public void setText(String text) {
+    public void setText(String text,String time) {
         txt.setText(text);
-        txt.setTime("10:30 PM");    //  Testing
+        txt.setTime(time);    //  Testing
     }
 
     @SuppressWarnings("unchecked")

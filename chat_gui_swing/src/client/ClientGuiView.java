@@ -44,6 +44,7 @@ public class ClientGuiView extends javax.swing.JFrame {
         com.setMinimumSize(new Dimension(800, 500));
         com.setMaximumSize(Toolkit.getDefaultToolkit().getScreenSize());
         com.setSnapSize(new Dimension(10, 10));
+        
     }
 
 
@@ -170,6 +171,8 @@ public class ClientGuiView extends javax.swing.JFrame {
 
         pack();
         setLocationRelativeTo(null);
+
+        
     }// </editor-fold>//GEN-END:initComponents
 
     private int pX;
@@ -184,7 +187,7 @@ public class ClientGuiView extends javax.swing.JFrame {
     }//GEN-LAST:event_titleMousePressed
 
     private void cmdCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCloseActionPerformed
-        System.exit(0);
+    	System.exit(0);
     }//GEN-LAST:event_cmdCloseActionPerformed
 
     private void cmdMinimizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMinimizeActionPerformed

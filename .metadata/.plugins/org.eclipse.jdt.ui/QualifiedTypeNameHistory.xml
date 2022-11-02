@@ -3,7 +3,6 @@
     <fullyQualifiedTypeName name="client.ScrollBar"/>
     <fullyQualifiedTypeName name="guiCore.ComponentResizer"/>
     <fullyQualifiedTypeName name="client.RunMain"/>
-    <fullyQualifiedTypeName name="client.ClientGuiView"/>
     <fullyQualifiedTypeName name="client.Home"/>
     <fullyQualifiedTypeName name="guiCore.Chat"/>
     <fullyQualifiedTypeName name="event.PublicEvent"/>
@@ -11,5 +10,15 @@
     <fullyQualifiedTypeName name="guiCore.Home"/>
     <fullyQualifiedTypeName name="guiCore.ScrollBar"/>
     <fullyQualifiedTypeName name="javax.swing.event.AncestorListener"/>
+    <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
+    <fullyQualifiedTypeName name="java.time.LocalDateTime"/>
+    <fullyQualifiedTypeName name="guiCore.Menu_Left"/>
+    <fullyQualifiedTypeName name="client.ClientGuiView"/>
+    <fullyQualifiedTypeName name="client.Controller"/>
+    <fullyQualifiedTypeName name="java.lang.Exception"/>
+    <fullyQualifiedTypeName name="java.lang.Thread"/>
     <fullyQualifiedTypeName name="java.awt.event.MouseListener"/>
+    <fullyQualifiedTypeName name="java.awt.event.ActionListener"/>
+    <fullyQualifiedTypeName name="guiCore.Item_People"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
 </qualifiedTypeNameHistroy>

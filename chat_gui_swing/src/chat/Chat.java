@@ -1,5 +1,8 @@
 package chat;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import event.EventChat;
 import event.PublicEvent;
 import net.miginfocom.swing.MigLayout;
@@ -43,7 +46,11 @@ public class Chat extends javax.swing.JPanel {
         PublicEvent.getInstance().addEventChat(new EventChat() {
             @Override
             public void sendMessage(String text) {
-                chatBody.addItemRight(text);
+            	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");  
+            	LocalDateTime now = LocalDateTime.now();  
+            	
+            	
+                chatBody.addItemRight(text,dtf.format(now));
             }
         });
         add(chatTitle, "wrap");
