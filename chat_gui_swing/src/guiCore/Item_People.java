@@ -12,6 +12,14 @@ public class Item_People extends javax.swing.JPanel {
     private ImageAvatar imageAvatar1;
     private javax.swing.JLabel lb;
 
+	public javax.swing.JLabel getLb() {
+		return lb;
+	}
+
+	public void setLb(javax.swing.JLabel lb) {
+		this.lb = lb;
+	}
+
 	public Item_People(String name) {
 		this.name = name;
         initComponents();

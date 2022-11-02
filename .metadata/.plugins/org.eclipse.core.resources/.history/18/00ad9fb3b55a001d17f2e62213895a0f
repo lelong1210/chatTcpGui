@@ -1,0 +1,46 @@
+package core;
+
+
+import java.util.ArrayList;
+import javax.swing.JLabel;
+import guiCore.*;
+
+
+public class ListMessChat {
+	private String username;
+	private String messLast;
+	private ArrayList<Item_People> listItemPeople = new ArrayList<>(); //String allMess;
+	
+	public ArrayList<Item_People> getListItemPeople() {
+		return listItemPeople;
+	}
+	public void setListItemPeople(ArrayList<Item_People> listItemPeople) {
+		this.listItemPeople = listItemPeople;
+	}
+	private JLabel labelOfUsername;
+	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getMessLast() {
+		return messLast;
+	}
+	public void setMessLast(String messLast) {
+		this.messLast = messLast;
+	}
+	public JLabel getLabelOfUsername() {
+		return labelOfUsername;
+	}
+	public void setLabelOfUsername(JLabel labelOfUsername) {
+		this.labelOfUsername = labelOfUsername;
+	}
+	
+	public ListMessChat(String username,String messLast) {
+		this.username = username;
+		this.messLast = messLast;
+		this.labelOfUsername = labelOfUsername;
+	}
+}

@@ -9,13 +9,20 @@ import net.miginfocom.swing.MigLayout;
 
 public class Chat extends javax.swing.JPanel {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Chat_Title chatTitle;
-    private Chat_Body chatBody;
-    public Chat_Body getChatBody() {
+
+	public Chat_Title getChatTitle() {
+		return chatTitle;
+	}
+
+	public void setChatTitle(Chat_Title chatTitle) {
+		this.chatTitle = chatTitle;
+	}
+
+	private Chat_Body chatBody;
+
+	public Chat_Body getChatBody() {
 		return chatBody;
 	}
 
@@ -25,7 +32,7 @@ public class Chat extends javax.swing.JPanel {
 
 	private Chat_Bottom chatBottom;
 
-    public Chat_Bottom getChatBottom() {
+	public Chat_Bottom getChatBottom() {
 		return chatBottom;
 	}
 
@@ -34,43 +41,29 @@ public class Chat extends javax.swing.JPanel {
 	}
 
 	public Chat() {
-        initComponents();
-        init();
-    }
+		initComponents();
+		init();
+	}
 
-    private void init() {
-        setLayout(new MigLayout("fillx", "0[fill]0", "0[]0[100%, bottom]0[shrink 0]0"));
-        chatTitle = new Chat_Title();
-        chatBody = new Chat_Body();
-        chatBottom = new Chat_Bottom();
-        PublicEvent.getInstance().addEventChat(new EventChat() {
-            @Override
-            public void sendMessage(String text) {
-            	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");  
-            	LocalDateTime now = LocalDateTime.now();  
-            	
-            	
-                chatBody.addItemRight(text,dtf.format(now));
-            }
-        });
-        add(chatTitle, "wrap");
-        add(chatBody, "wrap");
-        add(chatBottom, "h ::50%");
-    }
+	private void init() {
+		setLayout(new MigLayout("fillx", "0[fill]0", "0[]0[100%, bottom]0[shrink 0]0"));
+		chatTitle = new Chat_Title();
+		chatBody = new Chat_Body();
+		chatBottom = new Chat_Bottom();
+		add(chatTitle, "wrap");
+		add(chatBody, "wrap");
+		add(chatBottom, "h ::50%");
+	}
 
-    private void initComponents() {
+	private void initComponents() {
 
-        setBackground(new java.awt.Color(255, 255, 255));
+		setBackground(new java.awt.Color(255, 255, 255));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 727, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 681, Short.MAX_VALUE)
-        );
-    }
+		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+		this.setLayout(layout);
+		layout.setHorizontalGroup(
+				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 727, Short.MAX_VALUE));
+		layout.setVerticalGroup(
+				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 681, Short.MAX_VALUE));
+	}
 }

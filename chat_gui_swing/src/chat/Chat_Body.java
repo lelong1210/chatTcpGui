@@ -1,6 +1,8 @@
 package chat;
 
 import java.awt.Color;
+import java.awt.Point;
+import java.awt.Rectangle;
 
 import guiCore.*;
 import net.miginfocom.swing.MigLayout;
@@ -8,6 +10,9 @@ import net.miginfocom.swing.MigLayout;
 public class Chat_Body extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = 1L;
+	
+    private javax.swing.JPanel body;
+    private javax.swing.JScrollPane sp;
 
 	public Chat_Body() {
         initComponents();
@@ -25,17 +30,37 @@ public class Chat_Body extends javax.swing.JPanel {
         item.setText(text,time);
         body.add(item, "wrap, w ::80%");
         //  ::80% set max with 80%
+        
+        rePaint();
+    }
+    
+    public void rePaint() {
+    	
         body.repaint();
         body.revalidate();
+        
+        int height = (int)body.getPreferredSize().getHeight();
+        Rectangle rect = new Rectangle(0,height,10,10);
+        body.scrollRectToVisible(rect);
     }
 
     public void addItemRight(String text,String time) {
+    	
+    	
         Chat_Right item = new Chat_Right();
         item.setText(text,time);;
         body.add(item, "wrap, al right, w ::80%");
         //  ::80% set max with 80%
+        
+        rePaint();
+    }
+    
+    public void clearChat() {
+
+    	body.removeAll();
         body.repaint();
         body.revalidate();
+        
     }
 
     private void initComponents() {
@@ -71,11 +96,5 @@ public class Chat_Body extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(sp)
         );
-    }// </editor-fold>//GEN-END:initComponents
-
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel body;
-    private javax.swing.JScrollPane sp;
-    // End of variables declaration//GEN-END:variables
+    }
 }

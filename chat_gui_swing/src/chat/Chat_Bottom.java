@@ -66,9 +66,12 @@ public class Chat_Bottom extends javax.swing.JPanel {
                     refresh();
                 } else {
                     txt.grabFocus();
+                    refresh();
                 }
             }
         });
+        
+        
         panel.add(cmd);
         add(panel);
     }
@@ -77,7 +80,6 @@ public class Chat_Bottom extends javax.swing.JPanel {
         revalidate();
     }
 
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         setBackground(new java.awt.Color(229, 229, 229));
@@ -92,10 +94,6 @@ public class Chat_Bottom extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 40, Short.MAX_VALUE)
         );
-    }// </editor-fold>//GEN-END:initComponents
-
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    // End of variables declaration//GEN-END:variables
+    }
 }
 

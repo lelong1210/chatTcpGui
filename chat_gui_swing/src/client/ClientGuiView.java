@@ -13,7 +13,8 @@ public class ClientGuiView extends javax.swing.JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	// Variables declaration - do not modify//GEN-BEGIN:variables
+    private int pX;
+    private int pY;
     private javax.swing.JPanel background;
     private javax.swing.JLayeredPane body;
     public Home getHome() {
@@ -29,8 +30,7 @@ public class ClientGuiView extends javax.swing.JFrame {
     private javax.swing.JButton cmdMinimize;
     private Home home;
     private javax.swing.JPanel title;
-    // End of variables declaration//GEN-END:variables
-	
+
     public ClientGuiView() {
         initComponents();
         init();
@@ -46,7 +46,6 @@ public class ClientGuiView extends javax.swing.JFrame {
         com.setSnapSize(new Dimension(10, 10));
         
     }
-
 
     private void initComponents() {
 
@@ -175,8 +174,6 @@ public class ClientGuiView extends javax.swing.JFrame {
         
     }// </editor-fold>//GEN-END:initComponents
 
-    private int pX;
-    private int pY;
     private void titleMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleMouseDragged
         this.setLocation(this.getLocation().x + evt.getX() - pX, this.getLocation().y + evt.getY() - pY);
     }//GEN-LAST:event_titleMouseDragged
