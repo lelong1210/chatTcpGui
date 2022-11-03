@@ -152,7 +152,7 @@ public class TCPClient {
 				for (ListMessChat listMessChat : listUserChat) {
 
 					if (listMessChat.getUsername().equals(chat_Title.getUserDes())) {
-						body.clearChat();
+//						body.clearChat();
 						ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
 
 						for (MessInfo mess : listMess.getListMessInfo()) {
@@ -162,7 +162,7 @@ public class TCPClient {
 								body.addItemLeft(mess.getMessContent(), "");
 							}
 						}
-						body.revalidate();
+//						body.revalidate();
 						break;
 					}
 				}

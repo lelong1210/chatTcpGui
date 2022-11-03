@@ -46,8 +46,7 @@ public class TCPClient {
 	private ClientGuiView view;
 	private ArrayList<ListMessChat> listUserChat = new ArrayList<ListMessChat>();
 
-	public TCPClient(String host, int port, Chat_Body body, Menu_Left menu_Left, Chat_Title chat_Title,
-			String username) {
+	public TCPClient(String host, int port, Chat_Body body, Menu_Left menu_Left, Chat_Title chat_Title, String username) {
 		this.host = host;
 		this.port = port;
 		this.body = body;
@@ -96,6 +95,8 @@ public class TCPClient {
 
 			this.chat_Title.setUserName(messInfo.getUserSource());
 
+//			JLabel labelusername = new JLabel("[ " + messInfo.getUserSource() + " ]");
+
 			Item_People item_People = new Item_People(messInfo.getUserSource());
 
 			item_People.addMouseListener(new MouseAdapter() {
@@ -103,13 +104,12 @@ public class TCPClient {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					// TODO Auto-generated method stub
-					body.clearChat();
 					for (ListMessChat listMessChat : listUserChat) {
 						if (listMessChat.getUsername().equals(messInfo.getUserSource())) {
-
-							chat_Title.setUserName(messInfo.getUserSource());
-							chat_Title.setUserDes(messInfo.getUserSource());
-
+							
+							chat_Title.setUserName(messInfo.getUserDes());
+							chat_Title.setUserDes(messInfo.getUserDes());
+							
 							ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
 //							textAreaLog.setText(listMess.getAllMess());
 
@@ -124,7 +124,6 @@ public class TCPClient {
 							break;
 						}
 					}
-					body.revalidate();
 				}
 			});
 
@@ -143,32 +142,19 @@ public class TCPClient {
 				}
 			}
 			if (!isUserTrue) {
-				ListMessChat list = new ListMessChat(messInfo.getUserSource(), messInfo.getMessContent(), item_People);
-				list.getListMessInfo().add(messInfo);
-				listUserChat.add(0, list);
+
+				listUserChat.add(0, new ListMessChat(messInfo.getUserSource(), messInfo.getMessContent(), item_People));
 			}
 
-			if (messInfo.getUserSource().equals(chat_Title.getUserDes())) {
-				for (ListMessChat listMessChat : listUserChat) {
+			for (ListMessChat listMessChat : listUserChat) {
 
-					if (listMessChat.getUsername().equals(chat_Title.getUserDes())) {
-						body.clearChat();
-						ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
-
-						for (MessInfo mess : listMess.getListMessInfo()) {
-							if (username.equals(mess.getUserSource())) {
-								body.addItemRight(mess.getMessContent(), "");
-							} else {
-								body.addItemLeft(mess.getMessContent(), "");
-							}
-						}
-						body.revalidate();
-						break;
-					}
-				}
+//				Item_People item = listMessChat.getItem_People();
+//
+//				menu_Left.updateListChat(item);
+//
+//				menu_Left.repaint();
+//				menu_Left.revalidate();
 			}
-
-			menu_Left.updateListChat(listUserChat);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -187,23 +173,24 @@ public class TCPClient {
 			boolean isUserTrue = false;
 
 			Item_People item_People = new Item_People(messInfo.getUserDes());
-
+			
 			item_People.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-
+					
 					body.clearChat();
 					for (ListMessChat listMessChat : listUserChat) {
 						if (listMessChat.getUsername().equals(messInfo.getUserDes())) {
-
+							
 							chat_Title.setUserName(messInfo.getUserDes());
 							chat_Title.setUserDes(messInfo.getUserDes());
-
+							
 							ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
-
+							
 							for (MessInfo mess : listMess.getListMessInfo()) {
-								System.out.println("size " + listMess.getListMessInfo().size());
-
+								System.out.println("size "+listMess.getListMessInfo().size());
+								
+								
 								if (username.equals(mess.getUserSource())) {
 									body.addItemRight(mess.getMessContent(), "");
 								} else {
@@ -214,7 +201,7 @@ public class TCPClient {
 							break;
 						}
 					}
-
+					
 					body.revalidate();
 
 				}

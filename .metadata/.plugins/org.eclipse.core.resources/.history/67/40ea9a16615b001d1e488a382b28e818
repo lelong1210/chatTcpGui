@@ -148,23 +148,26 @@ public class TCPClient {
 				listUserChat.add(0, list);
 			}
 
-			if (messInfo.getUserSource().equals(chat_Title.getUserDes())) {
-				for (ListMessChat listMessChat : listUserChat) {
+			
+			if(messInfo.getUserSource().equals(chat_Title.getUserDes())) {
+				
+			}
+			
+			for (ListMessChat listMessChat : listUserChat) {
 
-					if (listMessChat.getUsername().equals(chat_Title.getUserDes())) {
-						body.clearChat();
-						ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
+				if (listMessChat.getUsername().equals(chat_Title.getUserDes())) {
+					body.clearChat();
+					ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
 
-						for (MessInfo mess : listMess.getListMessInfo()) {
-							if (username.equals(mess.getUserSource())) {
-								body.addItemRight(mess.getMessContent(), "");
-							} else {
-								body.addItemLeft(mess.getMessContent(), "");
-							}
+					for (MessInfo mess : listMess.getListMessInfo()) {
+						if (username.equals(mess.getUserSource())) {
+							body.addItemRight(mess.getMessContent(), "");
+						} else {
+							body.addItemLeft(mess.getMessContent(), "");
 						}
-						body.revalidate();
-						break;
 					}
+					body.revalidate();
+					break;
 				}
 			}
 
