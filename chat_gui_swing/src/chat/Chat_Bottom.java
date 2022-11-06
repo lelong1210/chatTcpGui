@@ -22,7 +22,8 @@ public class Chat_Bottom extends javax.swing.JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	JIMSendTextPane txt;
+	
 	public Chat_Bottom() {
         initComponents();
         init();
@@ -32,7 +33,7 @@ public class Chat_Bottom extends javax.swing.JPanel {
         setLayout(new MigLayout("fillx, filly", "0[fill]0[]0[]2", "2[fill]2"));
         JScrollPane scroll = new JScrollPane();
         scroll.setBorder(null);
-        JIMSendTextPane txt = new JIMSendTextPane();
+        this.txt = new JIMSendTextPane();
         txt.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent ke) {
@@ -74,9 +75,33 @@ public class Chat_Bottom extends javax.swing.JPanel {
         
         panel.add(cmd);
         add(panel);
+        
+        JButton cmdMore = new JButton();
+        cmdMore.setBorder(null);
+        cmdMore.setContentAreaFilled(false);
+        cmdMore.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        cmdMore.setIcon(new ImageIcon(getClass().getResource("/client/icon/more_disable.png")));
+        cmdMore.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+            	PublicEvent.getInstance().getEventChat().sendFile();
+            }
+        });
+        panel.add(cmdMore);
+        panel.add(cmd);
+        add(panel, "wrap");
+        
     }
 
-    private void refresh() {
+    public JIMSendTextPane getTxt() {
+		return txt;
+	}
+
+	public void setTxt(JIMSendTextPane txt) {
+		this.txt = txt;
+	}
+
+	private void refresh() {
         revalidate();
     }
 

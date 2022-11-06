@@ -3,6 +3,7 @@ package client;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import guiCore.ComponentResizer;
 import guiCore.Home;
@@ -46,7 +47,18 @@ public class ClientGuiView extends javax.swing.JFrame {
         com.setSnapSize(new Dimension(10, 10));
         
     }
-
+	public String chooseFile() {
+		final JFileChooser fc = new JFileChooser();
+		fc.showOpenDialog(this);
+		try {
+			if (fc.getSelectedFile() != null) {
+				return fc.getSelectedFile().getPath();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
     private void initComponents() {
 
         border = new javax.swing.JPanel();

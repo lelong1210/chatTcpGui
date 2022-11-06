@@ -79,7 +79,7 @@ public class TCPServer extends Thread {
 									// tạo file
 									createFile(fileInfo);
 									// định nghĩa nơi để file
-									fileInfo.setDestinationDirectory("D:\\Code\\Code_Java\\ChatTCP\\Client\\");
+									fileInfo.setDestinationDirectory("/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Client/");
 									// định nghĩa nơi lấy file
 									fileInfo.setSourceDirectory(fileInfo.getDestinationDirectory()+fileInfo.getFilename());
 								} 

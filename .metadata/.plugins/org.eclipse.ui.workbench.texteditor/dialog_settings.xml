@@ -8,6 +8,7 @@
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="sen"/>
 			<item value="xin"/>
 			<item value="menuMessage"/>
 			<item value="cmdclo"/>

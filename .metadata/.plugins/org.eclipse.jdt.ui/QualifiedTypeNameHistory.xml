@@ -28,9 +28,11 @@
     <fullyQualifiedTypeName name="server.ServerGuiView"/>
     <fullyQualifiedTypeName name="java.awt.event.ActionListener"/>
     <fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
-    <fullyQualifiedTypeName name="core.MessInfo"/>
     <fullyQualifiedTypeName name="client.ClientGuiView"/>
     <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="guiCore.Item_People"/>
     <fullyQualifiedTypeName name="core.ListMessChat"/>
+    <fullyQualifiedTypeName name="javax.swing.JFileChooser"/>
+    <fullyQualifiedTypeName name="core.MessInfo"/>
+    <fullyQualifiedTypeName name="java.util.function.Function"/>
 </qualifiedTypeNameHistroy>

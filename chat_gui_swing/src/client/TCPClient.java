@@ -43,7 +43,6 @@ public class TCPClient {
 	private Chat_Title chat_Title;
 	private ObjectOutputStream oos = null;
 	private String username;
-	private ClientGuiView view;
 	private ArrayList<ListMessChat> listUserChat = new ArrayList<ListMessChat>();
 
 	public TCPClient(String host, int port, Chat_Body body, Menu_Left menu_Left, Chat_Title chat_Title,
@@ -54,7 +53,6 @@ public class TCPClient {
 		this.menu_Left = menu_Left;
 		this.chat_Title = chat_Title;
 		this.username = username;
-		this.view = view;
 	}
 
 	public void connectServer() {
@@ -77,8 +75,7 @@ public class TCPClient {
 
 			// send file
 			messInfo.setFileInfo(fileInfo);
-			System.out.println("messInfo Client: " + messInfo.getFileInfo().getFilename());
-			this.oos.writeObject(messInfo);
+			sendMess(messInfo);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -90,6 +87,9 @@ public class TCPClient {
 			boolean isUserTrue = false;
 			ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 			MessInfo messInfo = (MessInfo) ois.readObject();
+			
+			System.out.println("get file"+messInfo.getFileInfo());
+			
 			if (messInfo.getFileInfo() != null) {
 				createFile(messInfo.getFileInfo());
 			}
@@ -179,8 +179,10 @@ public class TCPClient {
 
 	public void sendMess(MessInfo messInfo) {
 		try {
-
+			
 			this.oos.writeObject(messInfo);
+			
+			System.out.println("send to: "+messInfo.getUserDes());
 
 			body.addItemRight(messInfo.getMessContent(), "");
 
@@ -191,7 +193,7 @@ public class TCPClient {
 			item_People.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-
+					// check and ve lai body chat khi click
 					body.clearChat();
 					for (ListMessChat listMessChat : listUserChat) {
 						if (listMessChat.getUsername().equals(messInfo.getUserDes())) {
@@ -202,7 +204,6 @@ public class TCPClient {
 							ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
 
 							for (MessInfo mess : listMess.getListMessInfo()) {
-								System.out.println("size " + listMess.getListMessInfo().size());
 
 								if (username.equals(mess.getUserSource())) {
 									body.addItemRight(mess.getMessContent(), "");
@@ -269,7 +270,7 @@ public class TCPClient {
 		return true;
 	}
 
-	private FileInfo getFileInfo(String sourceFilePath, String destinationDir) {
+	public FileInfo getFileInfo(String sourceFilePath, String destinationDir) {
 		FileInfo fileInfo = null;
 		BufferedInputStream bis = null;
 		try {
@@ -287,6 +288,9 @@ public class TCPClient {
 		} finally {
 			closeStream(bis);
 		}
+		
+		System.out.println("file get --> "+fileInfo.getFilename());
+		
 		return fileInfo;
 	}
 
