@@ -115,9 +115,9 @@ public class TCPClient {
 
 							for (MessInfo mess : listMess.getListMessInfo()) {
 								if (username.equals(mess.getUserSource())) {
-									body.addItemRight(mess.getMessContent(), "");
+									body.addItemRight(mess.getMessContent(), mess.getTime());
 								} else {
-									body.addItemLeft(mess.getMessContent(), "");
+									body.addItemLeft(mess.getMessContent(),mess.getTime());
 								}
 							}
 
@@ -184,7 +184,7 @@ public class TCPClient {
 			
 			System.out.println("send to: "+messInfo.getUserDes());
 
-			body.addItemRight(messInfo.getMessContent(), "");
+			body.addItemRight(messInfo.getMessContent(),messInfo.getTime());
 
 			boolean isUserTrue = false;
 

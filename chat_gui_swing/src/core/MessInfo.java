@@ -33,11 +33,21 @@ public class MessInfo implements Serializable {
 	private String userDes;
 	private String MessContent;
 	private FileInfo fileInfo;
+	public String getTime() {
+		return time;
+	}
 
-	public MessInfo(String userSource, String userDes, String MessContent, FileInfo fileInfo) {
+	public void setTime(String time) {
+		this.time = time;
+	}
+
+	private String time;
+
+	public MessInfo(String userSource, String userDes, String MessContent,String time, FileInfo fileInfo) {
 		this.userDes = userDes;
 		this.MessContent = MessContent;
 		this.userSource = userSource;
+		this.time = time;
 	}
 
 	public FileInfo getFileInfo() {

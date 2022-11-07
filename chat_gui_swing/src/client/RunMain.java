@@ -2,7 +2,7 @@ package client;
 
 import event.EventLogin;
 import event.PublicEvent;
-import guiCore.Login;
+import guiCore.LoginView;
 
 public class RunMain {
 	public static void main(String args[]) {
@@ -13,7 +13,7 @@ public class RunMain {
 				try {
 
 					
-					Login viewLog = new Login();
+					LoginView viewLog = new LoginView();
 					
 					
 					ClientGuiView view = new ClientGuiView();

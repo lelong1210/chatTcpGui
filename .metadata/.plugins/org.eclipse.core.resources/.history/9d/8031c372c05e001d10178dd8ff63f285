@@ -1,0 +1,74 @@
+package core;
+
+import java.sql.*;
+import java.util.ArrayList;
+
+
+public class Service {
+	private Connection conn;
+	private PreparedStatement prst;
+	private ArrayList<String> vData,vTitle;
+	
+	public Service() {
+		connectDB();
+	}
+	
+	public void connectDB() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			this.conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/projectJava", "root", "");
+			vData = new ArrayList<>();
+			vTitle = new ArrayList<>();
+		} catch (Exception e) {
+
+		}
+	}
+	public ArrayList<String> login(String username,String password) {
+		
+		if(vData != null) {
+			vData.clear();
+			vTitle.clear();
+		}
+
+		
+		String Login = "SELECT * FROM user WHERE user.username = ? AND user.password = ?";
+		try {
+			prst = conn.prepareStatement(Login);
+			prst.setString(1, "lql");
+			prst.setString(2, "12345678");
+			ResultSet rst = prst.executeQuery();
+			ResultSetMetaData rstm = rst.getMetaData();
+			int col = rstm.getColumnCount();
+			for (int i = 1; i <= col; i++) {
+				vTitle.add(rstm.getColumnName(i).toString());
+			}
+			while (rst.next()) {
+				ArrayList<String> row = new ArrayList<>();
+				for (int i = 1; i <= col; i++) {
+					row.add(rst.getString(i));
+				}
+				vData.addAll(row);
+			}
+			System.out.println(vData.size());
+			return vData;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return vData;
+	}
+ 	public ArrayList<String> getMessInfo(String username){
+ 		
+ 		return vData;
+ 	}
+ 	public boolean insertMessInfo() {
+
+ 		return false;
+ 	}
+	public boolean Register() {
+		return false;
+	}
+	public static void main(String[] args) {
+		Service service = new Service();
+		service.login();
+	}
+}

@@ -17,10 +17,12 @@ import javax.swing.JTextArea;
 
 import core.FileInfo;
 import core.MessInfo;
+import core.Service;
 import core.UserInfo;
 
 // class này là nhân của server
 public class TCPServer extends Thread {
+	private Service service;
 	// khai báo biến serversocket
 	private ServerSocket serverSocket;
 	// cổng 9900
@@ -31,6 +33,7 @@ public class TCPServer extends Thread {
 	private ArrayList<UserInfo> arrayListUser = new ArrayList<UserInfo>();
 	// constructor với tham số truyền vào là textArea
 	public TCPServer(JTextArea textAreaLog) {
+		this.service = new Service();
 		this.textAreaLog = textAreaLog;
 	}
 	// function dùng để mở cửa server
@@ -69,6 +72,9 @@ public class TCPServer extends Thread {
 							// get input from client
 							while (true) {
 								MessInfo messInfo = (MessInfo) ois.readObject();
+								
+								String pathFile = null;
+								
 								textAreaLog.append("\n Server send from " + userInfo.getUsername() + " to "
 										+ messInfo.getUserDes() + " with content: " + messInfo.getMessContent());
 
@@ -78,6 +84,8 @@ public class TCPServer extends Thread {
 									FileInfo fileInfo = (FileInfo) messInfo.getFileInfo();
 									// tạo file
 									createFile(fileInfo);
+									//get path 
+									pathFile = fileInfo.getDestinationDirectory() + fileInfo.getFilename();
 									// định nghĩa nơi để file
 									fileInfo.setDestinationDirectory("/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Client/");
 									// định nghĩa nơi lấy file
@@ -94,6 +102,14 @@ public class TCPServer extends Thread {
 										break;
 									}
 								}
+								// send to database
+								service.insertMessInfo(
+											messInfo.getUserSource(), 
+											messInfo.getUserDes(), 
+											messInfo.getMessContent(), 
+											messInfo.getTime(), 
+											pathFile
+										);
 
 							}
 						} catch (Exception e) {
