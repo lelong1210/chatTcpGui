@@ -5,7 +5,6 @@
     <fullyQualifiedTypeName name="client.RunMain"/>
     <fullyQualifiedTypeName name="client.Home"/>
     <fullyQualifiedTypeName name="guiCore.Chat"/>
-    <fullyQualifiedTypeName name="event.PublicEvent"/>
     <fullyQualifiedTypeName name="event.EventChat"/>
     <fullyQualifiedTypeName name="guiCore.Home"/>
     <fullyQualifiedTypeName name="guiCore.ScrollBar"/>
@@ -35,4 +34,14 @@
     <fullyQualifiedTypeName name="javax.swing.JFileChooser"/>
     <fullyQualifiedTypeName name="core.MessInfo"/>
     <fullyQualifiedTypeName name="java.util.function.Function"/>
+    <fullyQualifiedTypeName name="java.awt.Image"/>
+    <fullyQualifiedTypeName name="javax.swing.ImageIcon"/>
+    <fullyQualifiedTypeName name="javax.swing.BorderFactory"/>
+    <fullyQualifiedTypeName name="java.rmi.Remote"/>
+    <fullyQualifiedTypeName name="javax.security.auth.Refreshable"/>
+    <fullyQualifiedTypeName name="java.awt.Panel"/>
+    <fullyQualifiedTypeName name="javax.swing.JPanel"/>
+    <fullyQualifiedTypeName name="event.PublicEvent"/>
+    <fullyQualifiedTypeName name="event.EventLogin"/>
+    <fullyQualifiedTypeName name="guiCore.Login"/>
 </qualifiedTypeNameHistroy>

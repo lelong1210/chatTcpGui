@@ -1,5 +1,9 @@
 package client;
 
+import event.EventLogin;
+import event.PublicEvent;
+import guiCore.Login;
+
 public class RunMain {
 	public static void main(String args[]) {
 
@@ -7,8 +11,13 @@ public class RunMain {
 			@Override
 			public void run() {
 				try {
+
+					
+					Login viewLog = new Login();
+					
+					
 					ClientGuiView view = new ClientGuiView();
-					new Controller(view);
+					new Controller(view,viewLog);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
