@@ -1,14 +1,9 @@
 package client;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,15 +14,12 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 import chat.Chat_Body;
 import chat.Chat_Title;
 import core.FileInfo;
 import core.ListMessChat;
+import core.LoginRegisterMessInfo;
 import core.MessInfo;
 import guiCore.Item_People;
 import guiCore.Menu_Left;
@@ -37,7 +29,6 @@ public class TCPClient {
 	private Socket client;
 	private String host;
 	private int port;
-	private DataOutputStream outToServer;
 	private Chat_Body body;
 	private Menu_Left menu_Left;
 	private Chat_Title chat_Title;
@@ -45,23 +36,19 @@ public class TCPClient {
 	private String username;
 	private ArrayList<ListMessChat> listUserChat = new ArrayList<ListMessChat>();
 
-	public TCPClient(String host, int port, Chat_Body body, Menu_Left menu_Left, Chat_Title chat_Title,
-			String username) {
+	public TCPClient(String host, int port, Chat_Body body, Menu_Left menu_Left, Chat_Title chat_Title) {
 		this.host = host;
 		this.port = port;
 		this.body = body;
 		this.menu_Left = menu_Left;
 		this.chat_Title = chat_Title;
-		this.username = username;
 	}
 
 	public void connectServer() {
 		try {
 			this.client = new Socket(host, port);
-			this.outToServer = new DataOutputStream(client.getOutputStream());
-			System.out.println("connected to server.\n");
-			this.outToServer.writeUTF(this.username);
 			this.oos = new ObjectOutputStream(client.getOutputStream());
+			System.out.println("connected to server.\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -87,9 +74,9 @@ public class TCPClient {
 			boolean isUserTrue = false;
 			ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 			MessInfo messInfo = (MessInfo) ois.readObject();
-			
-			System.out.println("get file"+messInfo.getFileInfo());
-			
+
+			System.out.println("get file" + messInfo.getFileInfo());
+
 			if (messInfo.getFileInfo() != null) {
 				createFile(messInfo.getFileInfo());
 			}
@@ -111,13 +98,12 @@ public class TCPClient {
 							chat_Title.setUserDes(messInfo.getUserSource());
 
 							ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
-//							textAreaLog.setText(listMess.getAllMess());
 
 							for (MessInfo mess : listMess.getListMessInfo()) {
 								if (username.equals(mess.getUserSource())) {
 									body.addItemRight(mess.getMessContent(), mess.getTime());
 								} else {
-									body.addItemLeft(mess.getMessContent(),mess.getTime());
+									body.addItemLeft(mess.getMessContent(), mess.getTime());
 								}
 							}
 
@@ -157,9 +143,9 @@ public class TCPClient {
 
 						for (MessInfo mess : listMess.getListMessInfo()) {
 							if (username.equals(mess.getUserSource())) {
-								body.addItemRight(mess.getMessContent(), "");
+								body.addItemRight(mess.getMessContent(), mess.getTime());
 							} else {
-								body.addItemLeft(mess.getMessContent(), "");
+								body.addItemLeft(mess.getMessContent(), mess.getTime());
 							}
 						}
 						body.revalidate();
@@ -179,13 +165,11 @@ public class TCPClient {
 
 	public void sendMess(MessInfo messInfo) {
 		try {
-			
+
 			this.oos.writeObject(messInfo);
-			
-			System.out.println("send to: "+messInfo.getUserDes());
 
-			body.addItemRight(messInfo.getMessContent(),messInfo.getTime());
-
+			body.addItemRight(messInfo.getMessContent(), messInfo.getTime());
+			// check xem da co user trong list mess chat chưa
 			boolean isUserTrue = false;
 
 			Item_People item_People = new Item_People(messInfo.getUserDes());
@@ -206,9 +190,9 @@ public class TCPClient {
 							for (MessInfo mess : listMess.getListMessInfo()) {
 
 								if (username.equals(mess.getUserSource())) {
-									body.addItemRight(mess.getMessContent(), "");
+									body.addItemRight(mess.getMessContent(), mess.getTime());
 								} else {
-									body.addItemLeft(mess.getMessContent(), "");
+									body.addItemLeft(mess.getMessContent(), mess.getTime());
 								}
 							}
 
@@ -288,9 +272,7 @@ public class TCPClient {
 		} finally {
 			closeStream(bis);
 		}
-		
-		System.out.println("file get --> "+fileInfo.getFilename());
-		
+
 		return fileInfo;
 	}
 
@@ -322,5 +304,168 @@ public class TCPClient {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	public boolean LoginOrRegister(String username, String password, int option) throws Exception {
+
+		LoginRegisterMessInfo loginRegisterMessInfo = new LoginRegisterMessInfo(username, password, option, false);
+		this.oos.writeObject(loginRegisterMessInfo);
+
+		ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+		LoginRegisterMessInfo loginRegisterMessInfoInPutServer = (LoginRegisterMessInfo) ois.readObject();
+
+		if (loginRegisterMessInfoInPutServer.isStatus()) {
+			
+			this.username = username;
+			setUpInitListMessChat(loginRegisterMessInfoInPutServer.getArraylistMessInfo());
+			
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	public void setUpInitListMessChat(ArrayList<MessInfo> arrayMessInfos) {
+		try {
+
+			for (MessInfo messInfo : arrayMessInfos) {
+				
+				// check xem da co user trong list mess chat chưa
+				boolean isUserTrue = false;
+				Item_People item_People = null; 
+				
+				// neu nguoi nhan va username giong nhau se lay nguoi gui
+				if(messInfo.getUserDes().equals(this.username)) {
+					item_People = new Item_People(messInfo.getUserSource());
+				}else {
+					item_People = new Item_People(messInfo.getUserDes());
+				}
+				
+				
+
+				item_People.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						// check and ve lai body chat khi click
+						body.clearChat();
+						
+						if(messInfo.getUserDes().equals(username)) {
+							chat_Title.setUserName(messInfo.getUserSource());
+							chat_Title.setUserDes(messInfo.getUserSource());
+							
+							
+							for (ListMessChat listMessChat : listUserChat) {
+								
+								System.out.println("tcpclient: listmesschat "+listMessChat.getUsername());
+								
+								if (listMessChat.getUsername().equals(messInfo.getUserSource())) {
+
+									ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
+
+									for (MessInfo mess : listMess.getListMessInfo()) {
+										if (username.equals(mess.getUserSource())) {
+											body.addItemRight(mess.getMessContent(), mess.getTime());
+										} else {
+											body.addItemLeft(mess.getMessContent(), mess.getTime());
+										}
+									}
+
+									break;
+								}
+							}
+							
+						}else {
+							chat_Title.setUserName(messInfo.getUserDes());
+							chat_Title.setUserDes(messInfo.getUserDes());
+							
+							
+							for (ListMessChat listMessChat : listUserChat) {
+								
+								System.out.println("tcpclient: listmesschat "+listMessChat.getUsername());
+								
+								if (listMessChat.getUsername().equals(messInfo.getUserDes())) {
+
+									
+
+
+									ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
+
+									for (MessInfo mess : listMess.getListMessInfo()) {
+										if (username.equals(mess.getUserSource())) {
+											body.addItemRight(mess.getMessContent(), mess.getTime());
+										} else {
+											body.addItemLeft(mess.getMessContent(), mess.getTime());
+										}
+									}
+
+									break;
+								}
+							}
+						}
+
+						
+
+
+						body.revalidate();
+
+					}
+				});
+				// duyet va kiem tra xem co user trong listUserChat hay khong
+				for (ListMessChat listMessChat : listUserChat) {
+					
+					// neu nguoi nhan va username giong nhau se lay nguoi gui
+					if(messInfo.getUserDes().equals(this.username)) {	
+						if (listMessChat.getUsername().equals(messInfo.getUserSource())) {
+
+							ListMessChat listMessChatTmp = listMessChat;
+							listMessChatTmp.setMessLast(messInfo.getMessContent());
+							listMessChatTmp.getListMessInfo().add(messInfo);
+
+							listUserChat.remove(listUserChat.indexOf(listMessChat));
+							listUserChat.add(0, listMessChatTmp);
+
+							isUserTrue = true;
+							break;
+						}
+					}else {
+						if (listMessChat.getUsername().equals(messInfo.getUserDes())) {
+
+							ListMessChat listMessChatTmp = listMessChat;
+							listMessChatTmp.setMessLast(messInfo.getMessContent());
+							listMessChatTmp.getListMessInfo().add(messInfo);
+
+							listUserChat.remove(listUserChat.indexOf(listMessChat));
+							listUserChat.add(0, listMessChatTmp);
+
+							isUserTrue = true;
+							break;
+						}
+					}
+					
+
+				}
+				if (!isUserTrue) {
+					// neu nguoi nhan va username giong nhau se lay nguoi gui
+					if(messInfo.getUserDes().equals(username)) {
+						ListMessChat list = new ListMessChat(messInfo.getUserSource(), messInfo.getMessContent(), item_People);
+						list.getListMessInfo().add(messInfo);
+						listUserChat.add(0, list);
+					}else {
+						ListMessChat list = new ListMessChat(messInfo.getUserDes(), messInfo.getMessContent(), item_People);
+						list.getListMessInfo().add(messInfo);
+						listUserChat.add(0, list);
+					}
+
+				}
+
+				menu_Left.updateListChat(listUserChat);
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

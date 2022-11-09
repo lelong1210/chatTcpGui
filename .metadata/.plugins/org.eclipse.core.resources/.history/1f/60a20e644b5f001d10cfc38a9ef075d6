@@ -1,0 +1,58 @@
+package guiCore;
+import net.miginfocom.swing.MigLayout;
+import chat.*;
+
+public class Home extends javax.swing.JLayeredPane {
+
+	private static final long serialVersionUID = 1L;
+
+	private Chat chat;
+	private Menu_Left menu_Left;
+	
+	
+    public Home() {
+        initComponents();
+        init();
+    }
+
+    private void init() {
+    	this.chat = new Chat();
+    	this.menu_Left = new Menu_Left();
+    	
+        setLayout(new MigLayout("fillx, filly", "0[200!]5[fill, 100%]5[200!]0");
+        this.add(this.menu_Left);
+        this.add(this.chat);
+//        this.add(new Menu_Right());
+    }
+
+    public Menu_Left getMenu_Left() {
+		return menu_Left;
+	}
+
+	public void setMenu_Left(Menu_Left menu_Left) {
+		this.menu_Left = menu_Left;
+	}
+
+	public Chat getChat() {
+		return chat;
+	}
+
+	public void setChat(Chat chat) {
+		this.chat = chat;
+	}
+
+
+    private void initComponents() {
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1007, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 551, Short.MAX_VALUE)
+        );
+    }
+}

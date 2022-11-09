@@ -184,6 +184,8 @@ public class LoginView {
 		
 		
 		frame.getContentPane().add(panel_Login);
+		frame.repaint();
+		frame.revalidate();
 	}
 	
 	public void paintRegister() {
@@ -268,5 +270,7 @@ public class LoginView {
 		text_re_enter_pass.setColumns(10);
 		
 		frame.getContentPane().add(panel_Register);
+		frame.repaint();
+		frame.revalidate();
 	}
 }

@@ -1,0 +1,7 @@
+package core;
+
+public class LoginRegisterMessInfo {
+	private String username;
+	private String password;
+	private int option;
+}

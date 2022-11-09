@@ -1,0 +1,13 @@
+	public void LoginOrRegister() throws Exception{
+		while(true) {
+			LoginRegisterMessInfo loginRegisterMessInfo = new LoginRegisterMessInfo(username, password, option,false);
+			this.oos.writeObject(loginRegisterMessInfo);
+			
+			ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+			LoginRegisterMessInfo loginRegisterMessInfoIn = (LoginRegisterMessInfo) ois.readObject();
+			
+			if(loginRegisterMessInfoIn.isStatus()) {
+				break;
+			}
+		}
+	}

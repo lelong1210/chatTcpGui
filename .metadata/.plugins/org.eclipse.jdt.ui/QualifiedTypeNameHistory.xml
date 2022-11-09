@@ -12,10 +12,8 @@
     <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
     <fullyQualifiedTypeName name="java.time.LocalDateTime"/>
     <fullyQualifiedTypeName name="client.Controller"/>
-    <fullyQualifiedTypeName name="java.lang.Exception"/>
     <fullyQualifiedTypeName name="java.awt.Point"/>
     <fullyQualifiedTypeName name="java.awt.Rectangle"/>
-    <fullyQualifiedTypeName name="java.lang.Thread"/>
     <fullyQualifiedTypeName name="java.lang.Runnable"/>
     <fullyQualifiedTypeName name="javax.swing.JLabel"/>
     <fullyQualifiedTypeName name="guiCore.Menu_Left"/>
@@ -29,9 +27,7 @@
     <fullyQualifiedTypeName name="guiCore.Item_People"/>
     <fullyQualifiedTypeName name="core.ListMessChat"/>
     <fullyQualifiedTypeName name="javax.swing.JFileChooser"/>
-    <fullyQualifiedTypeName name="core.MessInfo"/>
     <fullyQualifiedTypeName name="java.util.function.Function"/>
-    <fullyQualifiedTypeName name="java.awt.Image"/>
     <fullyQualifiedTypeName name="javax.swing.ImageIcon"/>
     <fullyQualifiedTypeName name="javax.swing.BorderFactory"/>
     <fullyQualifiedTypeName name="java.rmi.Remote"/>
@@ -43,8 +39,19 @@
     <fullyQualifiedTypeName name="guiCore.Login"/>
     <fullyQualifiedTypeName name="java.sql.DriverManager"/>
     <fullyQualifiedTypeName name="com.mysql.jdbc.Connection"/>
-    <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="client.ClientGuiView"/>
     <fullyQualifiedTypeName name="server.ServerGuiView"/>
     <fullyQualifiedTypeName name="core.Service"/>
+    <fullyQualifiedTypeName name="java.awt.Image"/>
+    <fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
+    <fullyQualifiedTypeName name="java.awt.Graphics2D"/>
+    <fullyQualifiedTypeName name="java.awt.RenderingHints"/>
+    <fullyQualifiedTypeName name="java.io.Serializable"/>
+    <fullyQualifiedTypeName name="java.lang.Object"/>
+    <fullyQualifiedTypeName name="java.lang.Exception"/>
+    <fullyQualifiedTypeName name="java.lang.Thread"/>
+    <fullyQualifiedTypeName name="core.LoginRegisterMessInfo"/>
+    <fullyQualifiedTypeName name="core.FileInfo"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="core.MessInfo"/>
 </qualifiedTypeNameHistroy>

@@ -80,7 +80,7 @@ public class Chat_Bottom extends javax.swing.JPanel {
         cmdMore.setBorder(null);
         cmdMore.setContentAreaFilled(false);
         cmdMore.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        cmdMore.setIcon(new ImageIcon(getClass().getResource("/client/icon/more_disable.png")));
+        cmdMore.setIcon(new ImageIcon(getClass().getResource("/client/icon/link.png")));
         cmdMore.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import javax.swing.JTextArea;
 
 import core.FileInfo;
+import core.LoginRegisterMessInfo;
 import core.MessInfo;
 import core.Service;
 import core.UserInfo;
@@ -27,15 +28,17 @@ public class TCPServer extends Thread {
 	private ServerSocket serverSocket;
 	// cổng 9900
 	private int port = 9900;
-	// một textArea dùng để cập nhật 
+	// một textArea dùng để cập nhật
 	private JTextArea textAreaLog;
-	// mảng các User 
+	// mảng các User
 	private ArrayList<UserInfo> arrayListUser = new ArrayList<UserInfo>();
+
 	// constructor với tham số truyền vào là textArea
 	public TCPServer(JTextArea textAreaLog) {
 		this.service = new Service();
 		this.textAreaLog = textAreaLog;
 	}
+
 	// function dùng để mở cửa server
 	public void open() {
 		try {
@@ -45,75 +48,116 @@ public class TCPServer extends Thread {
 			e.printStackTrace();
 		}
 	}
+
 	// function run là một function sẽ thực hiện đa luồng khi ta kế thừa Thread
 	public void run() {
 		try {
 			while (true) {
-				// đồng ý cho client kết nối và khởi tạo một socket 
-				// ( khi một client kết nối tới server thì sẽ khởi tạo 1 socket 
-				//   nghĩ đơn giản thì đây là 1 chiếc xe giành riêng cho server và client đó )
-				// nên vì vậy phải có Thread		
+				// đồng ý cho client kết nối và khởi tạo một socket
+				// ( khi một client kết nối tới server thì sẽ khởi tạo 1 socket
+				// nghĩ đơn giản thì đây là 1 chiếc xe giành riêng cho server và client đó )
+				// nên vì vậy phải có Thread
 				Socket client = serverSocket.accept();
 				// client gửi thông tin tới server
-				DataInputStream inFromClient = new DataInputStream(client.getInputStream());
-				String userNameLogin = inFromClient.readUTF();
-				// create userInfo (login)
-				UserInfo userInfo = new UserInfo(client, userNameLogin);
-				arrayListUser.add(userInfo);
-				// get mess info
+
 				Thread threadInFromClient = new Thread() {
 					// class ObjectInputStream và ObjectOutputStream được dùng để gửi class
 					private ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 					private ObjectOutputStream oos = null;
+					String userNameLogin = null;
+					UserInfo userInfo = null;
 
 					@Override
 					public void run() {
 						try {
 							// get input from client
 							while (true) {
-								MessInfo messInfo = (MessInfo) ois.readObject();
+								Object object = ois.readObject();
 								
-								String pathFile = null;
-								
-								textAreaLog.append("\n Server send from " + userInfo.getUsername() + " to "
-										+ messInfo.getUserDes() + " with content: " + messInfo.getMessContent());
 
-								// check send file
-								if (messInfo.getFileInfo() != null) {
-									// khởi tạo file
-									FileInfo fileInfo = (FileInfo) messInfo.getFileInfo();
-									// tạo file
-									createFile(fileInfo);
-									//get path 
-									pathFile = fileInfo.getDestinationDirectory() + fileInfo.getFilename();
-									// định nghĩa nơi để file
-									fileInfo.setDestinationDirectory("/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Client/");
-									// định nghĩa nơi lấy file
-									fileInfo.setSourceDirectory(fileInfo.getDestinationDirectory()+fileInfo.getFilename());
-								} 
-								
-								// find users and send mess
-								for (UserInfo userInfo : arrayListUser) {
-									if (userInfo.getUsername().equals(messInfo.getUserDes())) {
-										Socket socketOfuserSend = (Socket) userInfo.getSocket();
-										oos = new ObjectOutputStream(socketOfuserSend.getOutputStream());
-										sendMess(oos, messInfo);
-										oos = null;
-										break;
+								if (object instanceof LoginRegisterMessInfo) {
+
+									ArrayList<MessInfo> arraylistMessInfo = new ArrayList<>();
+									
+									oos = new ObjectOutputStream(client.getOutputStream());
+									
+									LoginRegisterMessInfo loginRegisterMessInfo = (LoginRegisterMessInfo) object;
+
+									// option is login
+									if (loginRegisterMessInfo.getOption() == 0) {
+										if (service.login(loginRegisterMessInfo.getUsername(),
+												loginRegisterMessInfo.getPassword())) {
+											userNameLogin = loginRegisterMessInfo.getUsername();
+											userInfo = new UserInfo(client, userNameLogin);
+											arrayListUser.add(userInfo);
+											
+											
+											arraylistMessInfo = service.getMessInfo(userNameLogin);
+										
+											
+											loginRegisterMessInfo.setArraylistMessInfo(arraylistMessInfo);
+											loginRegisterMessInfo.setStatus(true);
+											
+										} else {
+											loginRegisterMessInfo.setStatus(false);
+										}
+										// option is register
+									} else {
+										if (service.Register(loginRegisterMessInfo.getUsername(),
+												loginRegisterMessInfo.getPassword())) {
+											loginRegisterMessInfo.setStatus(true);
+										} else {
+											loginRegisterMessInfo.setStatus(false);
+										}
 									}
+									System.out.println("send array in TCPserver "+loginRegisterMessInfo.getArraylistMessInfo().size());
+									sendMess(oos, loginRegisterMessInfo);
+									oos = null;
 								}
-								// send to database
-								service.insertMessInfo(
-											messInfo.getUserSource(), 
-											messInfo.getUserDes(), 
-											messInfo.getMessContent(), 
-											messInfo.getTime(), 
-											pathFile
-										);
+
+								if (object instanceof MessInfo) {
+
+									MessInfo messInfo = (MessInfo) object;
+
+									String pathFile = null;
+
+									textAreaLog.append("\n Server send from " + userInfo.getUsername() + " to "
+											+ messInfo.getUserDes() + " with content: " + messInfo.getMessContent());
+
+									// check send file
+									if (messInfo.getFileInfo() != null) {
+										// khởi tạo file
+										FileInfo fileInfo = (FileInfo) messInfo.getFileInfo();
+										// tạo file
+										createFile(fileInfo);
+										// get path
+										pathFile = fileInfo.getDestinationDirectory() + fileInfo.getFilename();
+										// định nghĩa nơi để file
+										fileInfo.setDestinationDirectory(
+												"/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Client/");
+										// định nghĩa nơi lấy file
+										fileInfo.setSourceDirectory(
+												fileInfo.getDestinationDirectory() + fileInfo.getFilename());
+									}
+
+									// find users and send mess
+									for (UserInfo userInfo : arrayListUser) {
+										if (userInfo.getUsername().equals(messInfo.getUserDes())) {
+											Socket socketOfuserSend = (Socket) userInfo.getSocket();
+											oos = new ObjectOutputStream(socketOfuserSend.getOutputStream());
+											sendMess(oos, messInfo);
+											oos = null;
+											break;
+										}
+									}
+									// send to database
+									service.insertMessInfo(messInfo.getUserSource(), messInfo.getUserDes(),
+											messInfo.getMessContent(), messInfo.getTime(), pathFile);
+								}
 
 							}
 						} catch (Exception e) {
-							// TODO: handle exception
+							System.out.println("try catch tcp server "+e.getMessage());
 						}
 					}
 				};
@@ -124,6 +168,7 @@ public class TCPServer extends Thread {
 			// TODO: handle exception
 		}
 	}
+
 	private void sendMess(ObjectOutputStream oos, MessInfo messInfo) {
 		try {
 			Thread threadSend = new Thread() {
@@ -132,6 +177,27 @@ public class TCPServer extends Thread {
 					// TODO Auto-generated method stub
 					try {
 						oos.writeObject(messInfo);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+			threadSend.start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void sendMess(ObjectOutputStream oos, LoginRegisterMessInfo loginRegisterMessInfo) {
+		try {
+			Thread threadSend = new Thread() {
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					try {
+						oos.writeObject(loginRegisterMessInfo);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

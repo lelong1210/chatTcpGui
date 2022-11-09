@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="Register"/>
+		<item key="selection" value="!isUserTrue"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="!isUserTrue"/>
+			<item value="Sys"/>
+			<item value="isSendFile"/>
+			<item value="userInfo"/>
 			<item value="Login"/>
 			<item value="sen"/>
 			<item value="xin"/>
@@ -19,7 +23,6 @@
 			<item value="home"/>
 			<item value="Home"/>
 			<item value="to do just one thing, and do it well? For Simpletext, that one thing is writing."/>
-			<item value="/com/raven/"/>
 		</list>
 		<list key="replacehistory">
 			<item value="Register"/>
