@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import core.MessInfo;
 import guiCore.*;
 import net.miginfocom.swing.MigLayout;
 
@@ -25,8 +26,8 @@ public class Chat_Body extends javax.swing.JPanel {
         sp.getVerticalScrollBar().setBackground(Color.WHITE);
     }
 
-    public void addItemLeft(String text,String time) {
-        Chat_Left item = new Chat_Left();
+    public void addItemLeft(String text,String time,MessInfo messInfo) {
+        Chat_Left item = new Chat_Left(messInfo);
         item.setText(text,time);
         body.add(item, "wrap, w ::80%");
         //  ::80% set max with 80%
@@ -44,11 +45,11 @@ public class Chat_Body extends javax.swing.JPanel {
         body.scrollRectToVisible(rect);
     }
 
-    public void addItemRight(String text,String time) {
+    public void addItemRight(String text,String time,MessInfo messInfo) {
     	
-    	
-        Chat_Right item = new Chat_Right();
-        item.setText(text,time);;
+        Chat_Right item = new Chat_Right(messInfo);
+        
+        item.setText(text,time);
         body.add(item, "wrap, al right, w ::80%");
         //  ::80% set max with 80%
         

@@ -13,6 +13,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import chat.Chat_Body;
@@ -75,11 +77,9 @@ public class TCPClient {
 			ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 			MessInfo messInfo = (MessInfo) ois.readObject();
 
-			System.out.println("get file" + messInfo.getFileInfo());
-
-			if (messInfo.getFileInfo() != null) {
-				createFile(messInfo.getFileInfo());
-			}
+//			if (messInfo.getFileInfo() != null) {
+//				createFile(messInfo.getFileInfo());
+//			}
 
 			this.chat_Title.setUserName(messInfo.getUserSource());
 
@@ -101,9 +101,9 @@ public class TCPClient {
 
 							for (MessInfo mess : listMess.getListMessInfo()) {
 								if (username.equals(mess.getUserSource())) {
-									body.addItemRight(mess.getMessContent(), mess.getTime());
+									body.addItemRight(mess.getMessContent(), mess.getTime(),mess);
 								} else {
-									body.addItemLeft(mess.getMessContent(), mess.getTime());
+									body.addItemLeft(mess.getMessContent(), mess.getTime(),mess);
 								}
 							}
 
@@ -143,9 +143,9 @@ public class TCPClient {
 
 						for (MessInfo mess : listMess.getListMessInfo()) {
 							if (username.equals(mess.getUserSource())) {
-								body.addItemRight(mess.getMessContent(), mess.getTime());
+								body.addItemRight(mess.getMessContent(), mess.getTime(),mess);
 							} else {
-								body.addItemLeft(mess.getMessContent(), mess.getTime());
+								body.addItemLeft(mess.getMessContent(), mess.getTime(),mess);
 							}
 						}
 						body.revalidate();
@@ -168,7 +168,7 @@ public class TCPClient {
 
 			this.oos.writeObject(messInfo);
 
-			body.addItemRight(messInfo.getMessContent(), messInfo.getTime());
+			body.addItemRight(messInfo.getMessContent(), messInfo.getTime(),messInfo);
 			// check xem da co user trong list mess chat chưa
 			boolean isUserTrue = false;
 
@@ -190,9 +190,9 @@ public class TCPClient {
 							for (MessInfo mess : listMess.getListMessInfo()) {
 
 								if (username.equals(mess.getUserSource())) {
-									body.addItemRight(mess.getMessContent(), mess.getTime());
+									body.addItemRight(mess.getMessContent(), mess.getTime(),mess);
 								} else {
-									body.addItemLeft(mess.getMessContent(), mess.getTime());
+									body.addItemLeft(mess.getMessContent(), mess.getTime(),mess);
 								}
 							}
 
@@ -234,12 +234,13 @@ public class TCPClient {
 		}
 	}
 
-	private boolean createFile(FileInfo fileInfo) {
+	public boolean createFile(FileInfo fileInfo) {
 		BufferedOutputStream bos = null;
-
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
 		try {
 			if (fileInfo != null) {
-				File fileReceive = new File(fileInfo.getDestinationDirectory() + fileInfo.getFilename());
+				File fileReceive = new File(fileInfo.getDestinationDirectory() +dtf.format(now)+ fileInfo.getFilename());
 				bos = new BufferedOutputStream(new FileOutputStream(fileReceive));
 				// write file content
 				bos.write(fileInfo.getDataBytes());
@@ -365,9 +366,9 @@ public class TCPClient {
 
 									for (MessInfo mess : listMess.getListMessInfo()) {
 										if (username.equals(mess.getUserSource())) {
-											body.addItemRight(mess.getMessContent(), mess.getTime());
+											body.addItemRight(mess.getMessContent(), mess.getTime(),mess);
 										} else {
-											body.addItemLeft(mess.getMessContent(), mess.getTime());
+											body.addItemLeft(mess.getMessContent(), mess.getTime(),mess);
 										}
 									}
 
@@ -393,9 +394,9 @@ public class TCPClient {
 
 									for (MessInfo mess : listMess.getListMessInfo()) {
 										if (username.equals(mess.getUserSource())) {
-											body.addItemRight(mess.getMessContent(), mess.getTime());
+											body.addItemRight(mess.getMessContent(), mess.getTime(),mess);
 										} else {
-											body.addItemLeft(mess.getMessContent(), mess.getTime());
+											body.addItemLeft(mess.getMessContent(), mess.getTime(),mess);
 										}
 									}
 

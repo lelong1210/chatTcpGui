@@ -11,6 +11,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.JTextArea;
@@ -126,6 +128,17 @@ public class TCPServer extends Thread {
 
 									// check send file
 									if (messInfo.getFileInfo() != null) {
+										// tao ten khong trung bang time 
+										
+										
+										DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+										LocalDateTime now = LocalDateTime.now();
+										
+										String nameLast = dtf.format(now)+messInfo.getFileInfo().getFilename();
+										nameLast = nameLast.trim();
+										
+										messInfo.getFileInfo().setFilename(nameLast);
+										
 										// khởi tạo file
 										FileInfo fileInfo = (FileInfo) messInfo.getFileInfo();
 										// tạo file
@@ -213,9 +226,9 @@ public class TCPServer extends Thread {
 
 	private boolean createFile(FileInfo fileInfo) {
 		BufferedOutputStream bos = null;
-
 		try {
 			if (fileInfo != null) {
+				
 				File fileReceive = new File(fileInfo.getDestinationDirectory() + fileInfo.getFilename());
 				bos = new BufferedOutputStream(new FileOutputStream(fileReceive));
 				// write file content

@@ -9,7 +9,6 @@
     <fullyQualifiedTypeName name="guiCore.Home"/>
     <fullyQualifiedTypeName name="guiCore.ScrollBar"/>
     <fullyQualifiedTypeName name="javax.swing.event.AncestorListener"/>
-    <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
     <fullyQualifiedTypeName name="java.time.LocalDateTime"/>
     <fullyQualifiedTypeName name="client.Controller"/>
     <fullyQualifiedTypeName name="java.awt.Point"/>
@@ -34,7 +33,6 @@
     <fullyQualifiedTypeName name="javax.security.auth.Refreshable"/>
     <fullyQualifiedTypeName name="java.awt.Panel"/>
     <fullyQualifiedTypeName name="javax.swing.JPanel"/>
-    <fullyQualifiedTypeName name="event.PublicEvent"/>
     <fullyQualifiedTypeName name="event.EventLogin"/>
     <fullyQualifiedTypeName name="guiCore.Login"/>
     <fullyQualifiedTypeName name="java.sql.DriverManager"/>
@@ -51,7 +49,12 @@
     <fullyQualifiedTypeName name="java.lang.Exception"/>
     <fullyQualifiedTypeName name="java.lang.Thread"/>
     <fullyQualifiedTypeName name="core.LoginRegisterMessInfo"/>
-    <fullyQualifiedTypeName name="core.FileInfo"/>
     <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="core.MessInfo"/>
+    <fullyQualifiedTypeName name="java.awt.TextField"/>
+    <fullyQualifiedTypeName name="javax.swing.JTextField"/>
+    <fullyQualifiedTypeName name="core.FileInfo"/>
+    <fullyQualifiedTypeName name="event.PublicEvent"/>
+    <fullyQualifiedTypeName name="java.io.File"/>
+    <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
 </qualifiedTypeNameHistroy>

@@ -2,14 +2,26 @@ package chat;
 
 import java.awt.Color;
 
+import core.MessInfo;
+
 public class Chat_Right extends javax.swing.JLayeredPane {
 
 	private static final long serialVersionUID = 1L;
 	private Chat_Item txt;
+	private MessInfo messInfo;
+	
+	public MessInfo getMessInfo() {
+		return messInfo;
+	}
 
-	public Chat_Right() {
+	public void setMessInfo(MessInfo messInfo) {
+		this.messInfo = messInfo;
+	}
+
+	public Chat_Right(MessInfo messInfo) {
+		this.messInfo = messInfo;
         initComponents();
-        txt.setBackground(new Color(179, 233, 255));
+        txt.setBackground(new Color(179, 233, 255));        
     }
 
     public void setText(String text,String time) {
@@ -20,7 +32,7 @@ public class Chat_Right extends javax.swing.JLayeredPane {
 
     private void initComponents() {
 
-        txt = new Chat_Item();
+        txt = new Chat_Item(this.messInfo);
 
         setLayer(txt, javax.swing.JLayeredPane.DEFAULT_LAYER);
 

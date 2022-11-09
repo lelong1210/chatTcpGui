@@ -2,9 +2,12 @@ package chat;
 
 import java.awt.Color;
 
+import core.MessInfo;
+
 public class Chat_Left extends javax.swing.JLayeredPane {
 
-    public Chat_Left() {
+    public Chat_Left(MessInfo messInfo) {
+        this.messInfo = messInfo;
         initComponents();
         txt.setBackground(new Color(242, 242, 242));
     }
@@ -18,7 +21,7 @@ public class Chat_Left extends javax.swing.JLayeredPane {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        txt = new Chat_Item();
+        txt = new Chat_Item(this.messInfo);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -37,5 +40,15 @@ public class Chat_Left extends javax.swing.JLayeredPane {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private Chat_Item txt;
+	public MessInfo getMessInfo() {
+		return messInfo;
+	}
+
+	public void setMessInfo(MessInfo messInfo) {
+		this.messInfo = messInfo;
+	}
+
+
+	private MessInfo messInfo;
     // End of variables declaration//GEN-END:variables
 }

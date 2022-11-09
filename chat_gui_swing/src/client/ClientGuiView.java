@@ -2,6 +2,8 @@ package client;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -59,6 +61,21 @@ public class ClientGuiView extends javax.swing.JFrame {
 		}
 		return null;
 	}
+	
+	public String chooseFolder(String fileName) {
+		final JFileChooser fc = new JFileChooser(fileName);
+		fc.setSelectedFile(new File(fileName));
+		fc.showSaveDialog(this);
+		try {
+			if (fc.getCurrentDirectory() != null) {
+				return fc.getCurrentDirectory().getPath();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
     private void initComponents() {
 
         border = new javax.swing.JPanel();
