@@ -1,0 +1,28 @@
+package core;
+
+import java.io.Serializable;
+
+public class ExitOrLogout implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
+	private int option;
+	private String username;
+	public int getOption() {
+		return option;
+	}
+	public void setOption(int option) {
+		this.option = option;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public ExitOrLogout(int option, String username) {
+		super();
+		this.option = option;
+		this.username = username;
+	}
+	
+}

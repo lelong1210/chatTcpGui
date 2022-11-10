@@ -10,6 +10,7 @@ import java.rmi.Remote;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -141,7 +142,7 @@ public class LoginView {
 		lblNewLabel_1.setBounds(12, 143, 70, 15);
 		panel_Login.add(lblNewLabel_1);
 		
-		text_enter_pass = new JTextField();
+		text_enter_pass = new JPasswordField();
 		text_enter_pass.setBounds(158, 141, 154, 30);
 		panel_Login.add(text_enter_pass);
 		text_enter_pass.setColumns(10);

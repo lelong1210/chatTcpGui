@@ -6,9 +6,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.JOptionPane;
 
+import core.ExitOrLogout;
 import core.FileInfo;
 import core.MessInfo;
 import event.EventChat;
+import event.EventExitOrLogout;
 import event.EventLogin;
 import event.PublicEvent;
 import guiCore.*;
@@ -79,9 +81,10 @@ public class Controller implements ActionListener {
 									if(tcpClient.LoginOrRegister(username, password, 0)) {//service.login(username, password).size() != 0
 										view.setVisible(true);
 										loginView.getFrame().setVisible(false);
+										System.out.println("controller client: start ...");
 										startGUIChat(view, username);
 									}else {
-										JOptionPane.showMessageDialog(loginView.getFrame(), "Incorrect Information", "Alert",
+										JOptionPane.showMessageDialog(loginView.getFrame(), "Login Failed", "Alert",
 												JOptionPane.WARNING_MESSAGE);
 									}
 								} catch (Exception e) {
@@ -98,7 +101,46 @@ public class Controller implements ActionListener {
 
 				}
 			});
+			PublicEvent.getInstance().addeventExitOrLogout(new EventExitOrLogout() {
+				
+				@Override
+				public void sendExitToServer() {
+					ExitOrLogout exitOrLogout = new ExitOrLogout(tcpClient.getUsername());
+					try {
+						tcpClient.ExitorLogout(exitOrLogout);
+						System.exit(0);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 
+				@Override
+				public void sendLogoutToServer() {
+					ExitOrLogout exitOrLogout = new ExitOrLogout(tcpClient.getUsername());
+					try {
+						tcpClient.ExitorLogout(exitOrLogout);
+						view.setVisible(false);
+						loginView.getFrame().setVisible(true);
+						// tao ket noi moi
+						tcpClient = new TCPClient(host, port, view.getHome().getChat().getChatBody(), view.getHome().getMenu_Left(),
+								view.getHome().getChat().getChatTitle());
+						tcpClient.connectServer();
+						// reload gui chat
+						
+						view.getHome().getChat().getChatTitle().setUserName("Name");
+						view.getHome().getChat().getChatTitle().setUserDes(null);
+						view.getHome().getChat().getChatBody().clearChat();
+						
+						
+//						System.exit(0);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+			
 		} catch (Exception ex) {
 
 		}

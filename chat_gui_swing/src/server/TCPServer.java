@@ -14,9 +14,11 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JTextArea;
 
+import core.ExitOrLogout;
 import core.FileInfo;
 import core.LoginRegisterMessInfo;
 import core.MessInfo;
@@ -66,7 +68,6 @@ public class TCPServer extends Thread {
 					// class ObjectInputStream và ObjectOutputStream được dùng để gửi class
 					private ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
 					private ObjectOutputStream oos = null;
-					String userNameLogin = null;
 					UserInfo userInfo = null;
 
 					@Override
@@ -76,19 +77,26 @@ public class TCPServer extends Thread {
 							while (true) {
 								Object object = ois.readObject();
 								
-
+								if(object instanceof ExitOrLogout) {
+									ExitOrLogout exitOrLogout = (ExitOrLogout) object;
+									for (UserInfo userInfo : arrayListUser) {
+										if(userInfo.getUsername().equals(exitOrLogout.getUsername())) {
+											arrayListUser.remove(arrayListUser.indexOf(userInfo));
+										}
+									}
+								}
+								
 								if (object instanceof LoginRegisterMessInfo) {
 
 									ArrayList<MessInfo> arraylistMessInfo = new ArrayList<>();
-									
+									String userNameLogin = null;
 									oos = new ObjectOutputStream(client.getOutputStream());
-									
 									LoginRegisterMessInfo loginRegisterMessInfo = (LoginRegisterMessInfo) object;
 
 									// option is login
 									if (loginRegisterMessInfo.getOption() == 0) {
 										if (service.login(loginRegisterMessInfo.getUsername(),
-												loginRegisterMessInfo.getPassword())) {
+												loginRegisterMessInfo.getPassword()) && checkUserLogin(loginRegisterMessInfo.getUsername())) {
 											userNameLogin = loginRegisterMessInfo.getUsername();
 											userInfo = new UserInfo(client, userNameLogin);
 											arrayListUser.add(userInfo);
@@ -181,7 +189,13 @@ public class TCPServer extends Thread {
 			// TODO: handle exception
 		}
 	}
-
+	public boolean checkUserLogin(String username) {
+		for (UserInfo userInfo : arrayListUser) {
+			if(userInfo.getUsername().equals(username)) {
+				return false;
+			}
+		}return true;
+	}
 	private void sendMess(ObjectOutputStream oos, MessInfo messInfo) {
 		try {
 			Thread threadSend = new Thread() {

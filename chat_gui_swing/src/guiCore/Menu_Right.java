@@ -41,7 +41,7 @@ public class Menu_Right extends javax.swing.JPanel {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				menuMessageActionPerformed(evt);
 				Object view;
-
+				PublicEvent.getInstance().geteventExitOrLogout().sendLogoutToServer();
 //				PublicEvent.getInstance().getEventChat().newMessage(input);
 			}
 		});

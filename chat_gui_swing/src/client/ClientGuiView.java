@@ -7,6 +7,8 @@ import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+
+import event.PublicEvent;
 import guiCore.ComponentResizer;
 import guiCore.Home;
 
@@ -213,7 +215,8 @@ public class ClientGuiView extends javax.swing.JFrame {
     }//GEN-LAST:event_titleMousePressed
 
     private void cmdCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdCloseActionPerformed
-    	System.exit(0);
+    	PublicEvent.getInstance().geteventExitOrLogout().sendExitToServer();
+//    	System.exit(0);
     }//GEN-LAST:event_cmdCloseActionPerformed
 
     private void cmdMinimizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdMinimizeActionPerformed

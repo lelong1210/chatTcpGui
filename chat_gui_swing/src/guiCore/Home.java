@@ -19,7 +19,7 @@ public class Home extends javax.swing.JLayeredPane {
     	this.chat = new Chat();
     	this.menu_Left = new Menu_Left();
     	
-        setLayout(new MigLayout("fillx, filly", "0[200!]5[fill, 100%]5[30!]0", "0[fill]0"));//|| fillx, filly", "0[200!]5[fill, 100%]5[200!]0", "0[fill]0
+        setLayout(new MigLayout("fillx, filly", "0[200!]5[fill, 100%]5[28!]0", "0[fill]0"));//|| fillx, filly", "0[200!]5[fill, 100%]5[200!]0", "0[fill]0
         this.add(this.menu_Left);
         this.add(this.chat);
         this.add(new Menu_Right());
