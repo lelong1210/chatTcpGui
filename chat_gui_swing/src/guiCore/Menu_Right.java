@@ -35,7 +35,7 @@ public class Menu_Right extends javax.swing.JPanel {
 		menu.setOpaque(true);
 
 		menuMessage.setIconSelected(
-				new ImageIcon(Menu_Right.class.getResource("/client/icon/more.png"))); // NOI18N
+				new ImageIcon(Menu_Right.class.getResource("/client/icon/power-off.png"))); // NOI18N
 		menuMessage.setSelected(true);
 		menuMessage.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {

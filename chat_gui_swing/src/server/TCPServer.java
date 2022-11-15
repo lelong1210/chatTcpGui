@@ -24,6 +24,8 @@ import core.LoginRegisterMessInfo;
 import core.MessInfo;
 import core.Service;
 import core.UserInfo;
+import event.EventServer;
+import event.PublicEvent;
 
 // class này là nhân của server
 public class TCPServer extends Thread {
@@ -31,16 +33,28 @@ public class TCPServer extends Thread {
 	// khai báo biến serversocket
 	private ServerSocket serverSocket;
 	// cổng 9900
-	private int port = 9900;
+	private int port;
 	// một textArea dùng để cập nhật
 	private JTextArea textAreaLog;
 	// mảng các User
 	private ArrayList<UserInfo> arrayListUser = new ArrayList<UserInfo>();
+	//
+	private ServerGuiView serverGuiView;
+
+	public ArrayList<UserInfo> getArrayListUser() {
+		return arrayListUser;
+	}
+
+	public void setArrayListUser(ArrayList<UserInfo> arrayListUser) {
+		this.arrayListUser = arrayListUser;
+	}
 
 	// constructor với tham số truyền vào là textArea
-	public TCPServer(JTextArea textAreaLog) {
+	public TCPServer(int port, JTextArea textAreaLog, ServerGuiView serverGuiView) {
+		this.port = port;
 		this.service = new Service();
 		this.textAreaLog = textAreaLog;
+		this.serverGuiView = serverGuiView;
 	}
 
 	// function dùng để mở cửa server
@@ -76,16 +90,17 @@ public class TCPServer extends Thread {
 							// get input from client
 							while (true) {
 								Object object = ois.readObject();
-								
-								if(object instanceof ExitOrLogout) {
+
+								if (object instanceof ExitOrLogout) {
 									ExitOrLogout exitOrLogout = (ExitOrLogout) object;
 									for (UserInfo userInfo : arrayListUser) {
-										if(userInfo.getUsername().equals(exitOrLogout.getUsername())) {
+										if (userInfo.getUsername().equals(exitOrLogout.getUsername())) {
 											arrayListUser.remove(arrayListUser.indexOf(userInfo));
+											serverGuiView.UpdateUserLoginInSystem(arrayListUser);
 										}
 									}
 								}
-								
+
 								if (object instanceof LoginRegisterMessInfo) {
 
 									ArrayList<MessInfo> arraylistMessInfo = new ArrayList<>();
@@ -96,18 +111,19 @@ public class TCPServer extends Thread {
 									// option is login
 									if (loginRegisterMessInfo.getOption() == 0) {
 										if (service.login(loginRegisterMessInfo.getUsername(),
-												loginRegisterMessInfo.getPassword()) && checkUserLogin(loginRegisterMessInfo.getUsername())) {
+												loginRegisterMessInfo.getPassword())
+												&& checkUserLogin(loginRegisterMessInfo.getUsername())) {
 											userNameLogin = loginRegisterMessInfo.getUsername();
 											userInfo = new UserInfo(client, userNameLogin);
 											arrayListUser.add(userInfo);
-											
-											
+
 											arraylistMessInfo = service.getMessInfo(userNameLogin);
-										
-											
+
 											loginRegisterMessInfo.setArraylistMessInfo(arraylistMessInfo);
 											loginRegisterMessInfo.setStatus(true);
-											
+
+											serverGuiView.UpdateUserLoginInSystem(arrayListUser);
+
 										} else {
 											loginRegisterMessInfo.setStatus(false);
 										}
@@ -120,7 +136,8 @@ public class TCPServer extends Thread {
 											loginRegisterMessInfo.setStatus(false);
 										}
 									}
-									System.out.println("send array in TCPserver "+loginRegisterMessInfo.getArraylistMessInfo().size());
+									System.out.println("send array in TCPserver "
+											+ loginRegisterMessInfo.getArraylistMessInfo().size());
 									sendMess(oos, loginRegisterMessInfo);
 									oos = null;
 								}
@@ -136,17 +153,16 @@ public class TCPServer extends Thread {
 
 									// check send file
 									if (messInfo.getFileInfo() != null) {
-										// tao ten khong trung bang time 
-										
-										
+										// tao ten khong trung bang time
+
 										DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 										LocalDateTime now = LocalDateTime.now();
-										
-										String nameLast = dtf.format(now)+messInfo.getFileInfo().getFilename();
+
+										String nameLast = dtf.format(now) + messInfo.getFileInfo().getFilename();
 										nameLast = nameLast.trim();
-										
+
 										messInfo.getFileInfo().setFilename(nameLast);
-										
+
 										// khởi tạo file
 										FileInfo fileInfo = (FileInfo) messInfo.getFileInfo();
 										// tạo file
@@ -175,10 +191,31 @@ public class TCPServer extends Thread {
 									service.insertMessInfo(messInfo.getUserSource(), messInfo.getUserDes(),
 											messInfo.getMessContent(), messInfo.getTime(), pathFile);
 								}
+								//
+							      PublicEvent.getInstance().addeventServer(new EventServer() {
+										
+										@Override
+										public void UpdateUser(String username, int option) {
+											// TODO Auto-generated method stub
+											
+										}
+										
+										@Override
+										public void SelectTableUser() {
+											// TODO Auto-generated method stub
+											
+										}
+										
+										@Override
+										public void Adduser(String username, String Password) {
+											// TODO Auto-generated method stub
+											System.out.println("User In syste");
+										}
+									});
 
 							}
 						} catch (Exception e) {
-							System.out.println("try catch tcp server "+e.getMessage());
+							System.out.println("try catch tcp server " + e.getMessage());
 						}
 					}
 				};
@@ -189,13 +226,16 @@ public class TCPServer extends Thread {
 			// TODO: handle exception
 		}
 	}
+
 	public boolean checkUserLogin(String username) {
 		for (UserInfo userInfo : arrayListUser) {
-			if(userInfo.getUsername().equals(username)) {
+			if (userInfo.getUsername().equals(username)) {
 				return false;
 			}
-		}return true;
+		}
+		return true;
 	}
+
 	private void sendMess(ObjectOutputStream oos, MessInfo messInfo) {
 		try {
 			Thread threadSend = new Thread() {
@@ -242,7 +282,7 @@ public class TCPServer extends Thread {
 		BufferedOutputStream bos = null;
 		try {
 			if (fileInfo != null) {
-				
+
 				File fileReceive = new File(fileInfo.getDestinationDirectory() + fileInfo.getFilename());
 				bos = new BufferedOutputStream(new FileOutputStream(fileReceive));
 				// write file content

@@ -6,6 +6,7 @@ public class PublicEvent {
     private EventChat eventChat;
     private EventLogin eventLogin;
     private EventExitOrLogout eventExitOrLogout;
+    private EventServer eventServer;
 
     public static PublicEvent getInstance() {
         if (instance == null) {
@@ -29,7 +30,9 @@ public class PublicEvent {
     public void addeventExitOrLogout(EventExitOrLogout event) {
         this.eventExitOrLogout = event;
     }
-
+    public void addeventServer(EventServer event) {
+        this.eventServer = event;
+    }
 
     public EventChat getEventChat() {
         return eventChat;
@@ -41,5 +44,9 @@ public class PublicEvent {
     
     public EventExitOrLogout geteventExitOrLogout() {
         return eventExitOrLogout;
+    }
+    
+    public EventServer getEventServer() {
+        return eventServer;
     }
 }

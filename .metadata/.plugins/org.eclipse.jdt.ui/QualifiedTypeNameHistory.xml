@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="client.ScrollBar"/>
-    <fullyQualifiedTypeName name="guiCore.ComponentResizer"/>
-    <fullyQualifiedTypeName name="client.RunMain"/>
-    <fullyQualifiedTypeName name="client.Home"/>
     <fullyQualifiedTypeName name="guiCore.Chat"/>
     <fullyQualifiedTypeName name="event.EventChat"/>
     <fullyQualifiedTypeName name="guiCore.Home"/>
@@ -46,7 +42,6 @@
     <fullyQualifiedTypeName name="java.awt.RenderingHints"/>
     <fullyQualifiedTypeName name="java.io.Serializable"/>
     <fullyQualifiedTypeName name="java.lang.Object"/>
-    <fullyQualifiedTypeName name="java.lang.Exception"/>
     <fullyQualifiedTypeName name="java.lang.Thread"/>
     <fullyQualifiedTypeName name="core.LoginRegisterMessInfo"/>
     <fullyQualifiedTypeName name="java.util.ArrayList"/>
@@ -54,7 +49,15 @@
     <fullyQualifiedTypeName name="java.awt.TextField"/>
     <fullyQualifiedTypeName name="javax.swing.JTextField"/>
     <fullyQualifiedTypeName name="core.FileInfo"/>
-    <fullyQualifiedTypeName name="event.PublicEvent"/>
     <fullyQualifiedTypeName name="java.io.File"/>
     <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
+    <fullyQualifiedTypeName name="event.EventExit"/>
+    <fullyQualifiedTypeName name="org.w3c.dom.UserDataHandler"/>
+    <fullyQualifiedTypeName name="java.lang.Exception"/>
+    <fullyQualifiedTypeName name="core.ExitOrLogout"/>
+    <fullyQualifiedTypeName name="javax.swing.JPasswordField"/>
+    <fullyQualifiedTypeName name="event.EventExitOrLogout"/>
+    <fullyQualifiedTypeName name="event.PublicEvent"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+    <fullyQualifiedTypeName name="java.awt.Cursor"/>
 </qualifiedTypeNameHistroy>

@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import chat.Chat_Body;
 import chat.Chat_Title;
 import core.ExitOrLogout;
@@ -25,6 +27,7 @@ import core.ListMessChat;
 import core.LoginRegisterMessInfo;
 import core.MessInfo;
 import guiCore.Item_People;
+import guiCore.LoginView;
 import guiCore.Menu_Left;
 
 public class TCPClient {
@@ -36,6 +39,7 @@ public class TCPClient {
 	private Menu_Left menu_Left;
 	private Chat_Title chat_Title;
 	private ObjectOutputStream oos = null;
+	private LoginView loginView;
 	public ObjectOutputStream getOos() {
 		return oos;
 	}
@@ -56,12 +60,13 @@ public class TCPClient {
 
 	private ArrayList<ListMessChat> listUserChat = new ArrayList<ListMessChat>();
 
-	public TCPClient(String host, int port, Chat_Body body, Menu_Left menu_Left, Chat_Title chat_Title) {
+	public TCPClient(String host, int port, Chat_Body body, Menu_Left menu_Left, Chat_Title chat_Title,LoginView loginView) {
 		this.host = host;
 		this.port = port;
 		this.body = body;
 		this.menu_Left = menu_Left;
 		this.chat_Title = chat_Title;
+		this.loginView = loginView;
 	}
 
 	public void connectServer() {
@@ -71,7 +76,9 @@ public class TCPClient {
 			System.out.println("connected to server.\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(loginView.getFrame(), "Connect Server Failed", "Alert",
+					JOptionPane.DEFAULT_OPTION);
+			System.exit(0);
 		}
 	}
 
@@ -177,6 +184,9 @@ public class TCPClient {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(loginView.getFrame(), "Connect Server Failed", "Alert",
+					JOptionPane.DEFAULT_OPTION);
+			System.exit(0);
 		}
 
 	}

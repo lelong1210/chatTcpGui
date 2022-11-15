@@ -21,8 +21,10 @@ public class Controller implements ActionListener {
 	private int port = 9900;
 	private boolean isSendFile = false;
 
-	public Controller(ClientGuiView view, LoginView loginView) throws Exception {
+	public Controller(ClientGuiView view, LoginView loginView) {
 		try {
+			// tat gui chat 
+			view.setVisible(false);
 			
 			// loop GUI
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -33,11 +35,10 @@ public class Controller implements ActionListener {
 			}
 			// khoi tao ket noi toi server
 			tcpClient = new TCPClient(host, port, view.getHome().getChat().getChatBody(), view.getHome().getMenu_Left(),
-					view.getHome().getChat().getChatTitle());
+					view.getHome().getChat().getChatTitle(),loginView);
 			tcpClient.connectServer();
 			
-			// tat gui chat 
-			view.setVisible(false);
+
 			PublicEvent.getInstance().addEventLogin(new EventLogin() {
 
 				@Override
@@ -124,7 +125,7 @@ public class Controller implements ActionListener {
 						loginView.getFrame().setVisible(true);
 						// tao ket noi moi
 						tcpClient = new TCPClient(host, port, view.getHome().getChat().getChatBody(), view.getHome().getMenu_Left(),
-								view.getHome().getChat().getChatTitle());
+								view.getHome().getChat().getChatTitle(),null);
 						tcpClient.connectServer();
 						// reload gui chat
 						

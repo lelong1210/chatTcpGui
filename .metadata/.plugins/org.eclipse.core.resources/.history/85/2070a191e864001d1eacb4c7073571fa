@@ -1,0 +1,1332 @@
+package server;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorListener;
+import javax.swing.table.DefaultTableModel;
+
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.Year;
+import java.util.Iterator;
+import java.util.Vector;
+import java.awt.event.ActionEvent;
+
+public class TestView extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField tfHOTEN;
+	private JTextField textField_8;
+	private JTable table;
+	private Connection conn;
+	private PreparedStatement prst;
+	private Vector vData = new Vector();
+	private Vector vTitle = new Vector();
+	private Vector vListSocket = new Vector();
+	private Vector vTitlelistsocket = new Vector();
+	private Vector vLuuVaPhanHoiYeuCauTruyVan = new Vector();
+	private Vector vCapNhat = new Vector(); // bóc tách dữ liệu dùng để đấy lên tf
+	private String sqlselectAll = "select * from quanlythongtinxe";
+	private String sqlInserAll = "insert into quanlythongtinxe(HOTEN,CMND,NOITHUONGTRU,GIOITINH,TENXE,BIENSO,SOCHONGOI,NHANHIEU,SDT,NGAYDANGKY) values(?,?,?,?,?,?,?,?,?,?)";
+	private String sqlDelete = "delete from quanlythongtinxe where  BIENSO = ? ";
+	private String sqlUpdate = "update quanlythongtinxe set HOTEN = ?,CMND = ?,NOITHUONGTRU = ?,GIOITINH = ?,TENXE = ?,BIENSO = ?,SOCHONGOI = ?,NHANHIEU = ?,SDT = ? ,NGAYDANGKY = ? "
+			+ "WHERE BIENSO = ?";
+	private String sqlLIKESocket = "select * from quanlythongtinxe where CMND LIKE ? AND BIENSO LIKE ? ";
+	private String sqlLIKEAll = "select * from quanlythongtinxe where HOTEN LIKE ? OR CMND LIKE ? OR NOITHUONGTRU LIKE ? OR GIOITINH LIKE ? OR TENXE LIKE ? OR BIENSO LIKE ? OR SOCHONGOI LIKE ? OR NHANHIEU LIKE ? OR SDT LIKE ? OR NGAYDANGKY LIKE ? ";
+	private String sqlselectOne = "select * from quanlythongtinxe where BIENSO = ?";
+	private DefaultTableModel model;
+	private DefaultTableModel modelsocket;
+	private JTextField tfCong;
+	private JTable tableSocket;
+	private ServerSocket sever;
+	private int danhdauketnoi = 0;
+	private int suatai = -1;
+	private JLabel lblTt;
+	private String LikeCMND = "";
+	private String LIkeBienSo = "";
+	private String GuiDuLieu = "";
+	private String hoten = "";
+	private String cmnd = "";
+	private String noithuongtru = "";
+	private String gioitinh = "";
+	private String tenxe = "";
+	private String bienso = "";
+	private String sochongoi = "";
+	private String nhanhieu = "";
+	private String sodienthoai = "";
+	private String ngaydangky = "";
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					TestView frame = new TestView();
+					frame.setVisible(true);
+					frame.setLocationRelativeTo(null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 * 
+	 * @throws IOException
+	 */
+	public TestView() throws IOException {
+		KetNoiDatabase();
+		NapDulieutuDATABASE();
+		napthongtinuser();
+		ThietLapGiaoDien();
+	}
+
+	private void BatSever(int port, int i) {
+		try {
+
+			if (i == 1) {
+				sever.close();
+			} else {
+				sever = new ServerSocket(port);
+				while (true) {
+					if (i == 1) {
+						break;
+					}
+					Socket socket = sever.accept();
+					Vector row = new Vector();
+					QuanTriDoc qtd = new QuanTriDoc(socket);
+					row.add(0, socket);
+					row.add(1, "");
+					row.add(2, "đang kết nôi...");
+					row.add(3, "");
+					row.add(4, "");
+					vListSocket.add(row);
+					modelsocket.fireTableDataChanged();
+					Thread th1 = new Thread() {
+						@Override
+						public void run() {
+							while (true) {
+								if (qtd.getSms() != null) {
+									if (qtd.getSms().equals("[exit]")) {
+										capnhattrangthai(socket, "Đã Thoát");
+										qtd.setSms(null);
+									} else {
+										if (qtd.getSms().contains("sqltruyvan")) {
+											LikeCMND = qtd.getNdHT();
+											LIkeBienSo = qtd.getNdBS();
+											row.set(1, "truy vấn");
+//											row.set(2, "đang kết nôi...");
+											row.set(3, qtd.getNdBS());
+											truyVan(socket);
+											qtd.setSms(null);
+											System.out.println(qtd.getSms());
+										} else if (qtd.getSms().contains("update")) {
+											System.out.println(qtd.getSms());
+											XoaSach();
+											hoten = qtd.getHoten();
+											cmnd = qtd.getCmnd();
+											noithuongtru = qtd.getNoithuongtru();
+											gioitinh = qtd.getGioitinh();
+											tenxe = qtd.getTenxe();
+											bienso = qtd.getBienso();
+											sochongoi = qtd.getSochongoi();
+											nhanhieu = qtd.getNhanhieu();
+											sodienthoai = qtd.getSodienthoai();
+											ngaydangky = qtd.getngaydangky();
+											qtd.setSms(null);
+											CapnhatVaovCapNhat(socket, hoten, cmnd, noithuongtru, gioitinh, tenxe,
+													bienso, sochongoi, nhanhieu, sodienthoai, ngaydangky);
+											capnhattrangthai(socket, "Cập Nhật");
+
+										} else if (qtd.getSms().contains("insert")) {
+											XoaSach();
+											hoten = qtd.getHoten();
+											cmnd = qtd.getCmnd();
+											noithuongtru = qtd.getNoithuongtru();
+											gioitinh = qtd.getGioitinh();
+											tenxe = qtd.getTenxe();
+											bienso = qtd.getBienso();
+											sochongoi = qtd.getSochongoi();
+											nhanhieu = qtd.getNhanhieu();
+											sodienthoai = qtd.getSodienthoai();
+											ngaydangky = qtd.getngaydangky();
+											qtd.setSms(null);
+											CapnhatVaovCapNhat(socket, hoten, cmnd, noithuongtru, gioitinh, tenxe,
+													bienso, sochongoi, nhanhieu, sodienthoai, ngaydangky);
+											capnhattrangthai(socket, "Đăng Ký");
+										}
+									}
+								}
+								try {
+									Thread.sleep(1000);
+								} catch (Exception e) {
+
+								}
+							}
+						}
+
+					};
+					qtd.start();
+					th1.start();
+					System.out.println(qtd.getYeuCau());
+				}
+			}
+		} catch (Exception e) {
+			try {
+
+			} catch (Exception e2) {
+				// TODO: handle exception
+			}
+		}
+	}
+
+	private void CapnhatVaovCapNhat(Socket socket, String hoten, String cmnd, String noithuongtru, String gioitinh,
+			String tenxe, String bienso, String sochongoi, String nhanhieu, String sodienthoai, String ngaydangky) {
+		int size = vCapNhat.size();
+		int lap = 0;
+		int laptai = -1;
+		for (int i = 0; i < size; i++) {
+			Vector row = (Vector) vCapNhat.get(i);
+			Socket socketUD = (Socket) row.get(0);
+			if (socket == socketUD) {
+				lap = 1;
+				laptai = i;
+			}
+		}
+		if (lap == 1) {
+			Vector row = new Vector();
+			row.add(socket);
+			row.add(hoten);
+			row.add(noithuongtru);
+			row.add(cmnd);
+			row.add(gioitinh);
+			row.add(tenxe);
+			row.add(bienso);
+			row.add(sochongoi);
+			row.add(nhanhieu);
+			row.add(sodienthoai);
+			row.add(ngaydangky);
+			vCapNhat.set(laptai, row);
+		} else {
+			Vector row = new Vector();
+			row.add(socket);
+			row.add(hoten);
+			row.add(noithuongtru);
+			row.add(cmnd);
+			row.add(gioitinh);
+			row.add(tenxe);
+			row.add(bienso);
+			row.add(sochongoi);
+			row.add(nhanhieu);
+			row.add(sodienthoai);
+			row.add(ngaydangky);
+			vCapNhat.add(row);
+		}
+
+	}
+
+	protected void XoaSach() {
+		hoten = "";
+		cmnd = "";
+		noithuongtru = "";
+		gioitinh = "";
+		tenxe = "";
+		bienso = "";
+		sochongoi = "";
+		nhanhieu = "";
+		sodienthoai = "";
+		ngaydangky = "";
+
+	}
+
+	private void NapDulieutuDATABASE() {
+		vData.clear();
+		vTitle.clear();
+		try {
+			prst = conn.prepareStatement(sqlselectAll);
+			ResultSet rst = prst.executeQuery();
+			ResultSetMetaData rstm = rst.getMetaData();
+			int col = rstm.getColumnCount();
+			for (int i = 1; i <= col; i++) {
+				vTitle.add(rstm.getColumnName(i).toString());
+			}
+			while (rst.next()) {
+				Vector row = new Vector();
+				for (int i = 1; i <= col; i++) {
+					row.add(rst.getString(i));
+				}
+				vData.add(row);
+			}
+			model.fireTableDataChanged();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+	private void KetNoiDatabase() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quanlydangkyxe", "root", "");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+	}
+
+	private void ThietLapGiaoDien() {
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1542, 759);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JPanel panel_1 = new JPanel();
+		panel_1.setBounds(214, 0, 399, 291);
+		contentPane.add(panel_1);
+		panel_1.setLayout(null);
+
+		JLabel lblH = new JLabel("Username");
+		lblH.setBounds(33, 32, 86, 15);
+		panel_1.add(lblH);
+
+		tfHOTEN = new JTextField();
+		tfHOTEN.setBounds(182, 30, 165, 19);
+		panel_1.add(tfHOTEN);
+		tfHOTEN.setColumns(10);
+
+		JLabel lblNewLabel_2 = new JLabel("Status");
+		lblNewLabel_2.setBounds(33, 66, 64, 15);
+		panel_1.add(lblNewLabel_2);
+		textField_8 = new JTextField();
+		textField_8.setColumns(10);
+
+		JComboBox comboBox = new JComboBox();
+		comboBox.addItem("");
+		comboBox.addItem("NAM");
+		comboBox.addItem("NỮ");
+		comboBox.setBounds(182, 61, 165, 24);
+		panel_1.add(comboBox);
+
+		JButton btnThem = new JButton("Add User");
+		btnThem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int indexCbb = comboBox.getSelectedIndex();
+				try {
+					prst = conn.prepareStatement(sqlInserAll);
+
+					prst.setString(1, tfHOTEN.getText().toUpperCase());
+					prst.setString(2, tfCMND.getText().toUpperCase());
+					prst.setString(3, tfNOITHUONGTRU.getText().toUpperCase());
+
+					if (indexCbb == 1) {
+						prst.setString(4, "NAM");
+					} else if (indexCbb == 2) {
+						prst.setString(4, "NỮ");
+					}
+					prst.setString(5, tfTENXE.getText().toUpperCase());
+					prst.setString(6, tfBIENSO.getText().toUpperCase());
+					prst.setString(7, tfSOCN.getText().toUpperCase());
+					prst.setString(8, tfNHHIEU.getText().toUpperCase());
+					prst.setString(9, tfSDT.getText().toUpperCase());
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+					prst.executeUpdate();
+					NapDulieutuDATABASE();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		btnThem.setBounds(625, 40, 117, 25);
+		contentPane.add(btnThem);
+
+		JButton btnSua = new JButton("Sửa");
+		btnSua.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int indexCbb = comboBox.getSelectedIndex();
+				try {
+					int indexSelectRow = table.getSelectedRow();
+					Vector row = (Vector) vData.get(indexSelectRow);
+					prst = conn.prepareStatement(sqlUpdate);
+
+					prst.setString(1, tfHOTEN.getText().toUpperCase());
+					prst.setString(2, tfCMND.getText().toUpperCase());
+					prst.setString(3, tfNOITHUONGTRU.getText().toUpperCase());
+					if (indexCbb == 1) {
+						prst.setString(4, "NAM");
+					} else if (indexCbb == 2) {
+						prst.setString(4, "NỮ");
+					}
+					prst.setString(5, tfTENXE.getText().toUpperCase());
+					prst.setString(6, tfBIENSO.getText().toUpperCase());
+					prst.setString(7, tfSOCN.getText().toUpperCase());
+					prst.setString(8, tfNHHIEU.getText().toUpperCase());
+					prst.setString(9, tfSDT.getText().toUpperCase());
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+					prst.setString(11, row.get(5).toString().toUpperCase());
+					prst.executeUpdate();
+					NapDulieutuDATABASE();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		btnSua.setBounds(625, 77, 117, 25);
+		contentPane.add(btnSua);
+
+		JButton btnXoa = new JButton("Xóa");
+		btnXoa.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					int selectRow = table.getSelectedRow();
+					Vector row = (Vector) vData.get(selectRow);
+					prst = conn.prepareStatement(sqlDelete);
+					prst.setString(1, row.get(5).toString());
+					prst.executeUpdate();
+					NapDulieutuDATABASE();
+				} catch (Exception e2) {
+
+				}
+
+			}
+		});
+		btnXoa.setBounds(625, 114, 117, 25);
+		contentPane.add(btnXoa);
+
+		JButton bntTimKiem = new JButton("Tìm Kiếm");
+		bntTimKiem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String smsss = JOptionPane.showInputDialog(contentPane, "Mời Nhập");
+				truyvanDATABASE(smsss);
+			}
+		});
+		bntTimKiem.setBounds(625, 151, 117, 25);
+		contentPane.add(bntTimKiem);
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(12, 315, 1518, 401);
+		contentPane.add(scrollPane);
+
+		model = new DefaultTableModel(vData, vTitle);
+		table = new JTable(model);
+
+		table.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+//			@SuppressWarnings("deprecation")
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Vector row = (Vector) vData.get(table.getSelectedRow());
+				tfHOTEN.setText(row.get(0).toString());
+				tfCMND.setText(row.get(1).toString());
+				tfNOITHUONGTRU.setText(row.get(2).toString());
+				if (row.get(3).toString().equalsIgnoreCase("nam")) {
+					comboBox.setSelectedIndex(1);
+				} else if (row.get(3).toString().equalsIgnoreCase("nữ")) {
+					comboBox.setSelectedIndex(2);
+				}
+				tfTENXE.setText(row.get(4).toString());
+				tfBIENSO.setText(row.get(5).toString());
+				tfSOCN.setText(row.get(6).toString());
+				tfNHHIEU.setText(row.get(7).toString());
+				tfSDT.setText(row.get(8).toString());
+				Date date = Date.valueOf(row.get(9).toString());
+			}
+		});
+
+		scrollPane.setViewportView(table);
+
+		JButton btnThoat = new JButton("Thoát");
+		btnThoat.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					int size = vListSocket.size();
+					for(int i = 0 ; i < size ;i++) {
+						Vector row = (Vector) vListSocket.get(i);
+						Socket socket = (Socket) row.get(0);
+						QuanTriGui qtg = new QuanTriGui(socket,"[exit]");
+						qtg.start();
+					}
+					System.exit(0);
+				} catch (Exception e2) {
+					// TODO: handle exception
+				}
+			}
+		});
+		btnThoat.setBounds(625, 225, 117, 25);
+		contentPane.add(btnThoat);
+
+		JButton btnLamMoi = new JButton("Làm Mới");
+		btnLamMoi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				NapDulieutuDATABASE();
+				tfHOTEN.setText("");
+				tfBIENSO.setText("");
+				tfNHHIEU.setText("");
+				tfTENXE.setText("");
+				comboBox.setSelectedIndex(0);
+				tfNOITHUONGTRU.setText("");
+				tfSDT.setText("");
+				tfCMND.setText("");
+				tfSOCN.setText("");
+
+				modelsocket.fireTableDataChanged();
+				NapDulieutuDATABASE();
+			}
+		});
+		btnLamMoi.setBounds(625, 188, 117, 25);
+		contentPane.add(btnLamMoi);
+
+		JPanel panel = new JPanel();
+		panel.setBounds(850, 0, 659, 273);
+		contentPane.add(panel);
+		panel.setLayout(null);
+
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(0, 41, 659, 232);
+		panel.add(scrollPane_1);
+
+		modelsocket = new DefaultTableModel(vListSocket, vTitlelistsocket);
+		tableSocket = new JTable(modelsocket);
+		tableSocket.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int selecrowSocket = tableSocket.getSelectedRow();
+				Vector row = (Vector) vListSocket.get(selecrowSocket);
+				System.out.println(row.get(0));
+			}
+		});
+		scrollPane_1.setViewportView(tableSocket);
+
+		tfCong = new JTextField();
+		tfCong.setText("9939");
+		tfCong.setBounds(109, 13, 182, 28);
+		panel.add(tfCong);
+		tfCong.setColumns(10);
+
+		JButton button = new JButton("New button");
+		button.setBounds(575, 13, -1446, 251);
+		panel.add(button);
+
+		JLabel lblCng = new JLabel("Cổng");
+		lblCng.setBounds(44, 19, 70, 15);
+		panel.add(lblCng);
+
+		JButton btnbatsocket = new JButton("Bật ");
+		btnbatsocket.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (danhdauketnoi == 0) {
+					Thread th1 = new Thread() {
+						@Override
+						public void run() {
+							try {
+								lblTt.setText("bật");
+								danhdauketnoi = 1;
+								BatSever(Integer.parseInt(tfCong.getText().toString()), 0);
+							} catch (Exception e1) {
+								// TODO Auto-generated catch block
+//								e1.printStackTrace();
+							}
+						}
+					};
+
+					th1.start();
+				}
+			}
+		});
+		btnbatsocket.setBounds(1058, 285, 87, 25);
+		contentPane.add(btnbatsocket);
+
+		JButton btnNewButton_1 = new JButton("Tắt");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (danhdauketnoi == 1) {
+					try {
+						lblTt.setText("tắt");
+						sever.close();
+						BatSever(Integer.parseInt(tfCong.getText().toString()), 1);
+						danhdauketnoi = 0;
+						int size = vListSocket.size();
+						for (int i = 0; i < size; i++) {
+							Vector row = (Vector) vListSocket.get(i);
+							Socket socket = (Socket) row.get(0);
+							QuanTriGui qtg = new QuanTriGui(socket, "[exit]");
+							qtg.start();
+						}
+
+						vListSocket.clear();
+						modelsocket.fireTableDataChanged();
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		btnNewButton_1.setBounds(1284, 285, 87, 25);
+		contentPane.add(btnNewButton_1);
+
+		JButton btnNKN = new JButton("Ngắt Kết Nối");
+		btnNKN.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					int SeletedListSocket = tableSocket.getSelectedRow();
+					if(SeletedListSocket >= 0) {
+						Vector row = (Vector) vListSocket.get(SeletedListSocket);
+						Socket socket = (Socket) row.get(0);
+						QuanTriGui qtd = new QuanTriGui(socket, "[exit]");
+						qtd.start();
+						vListSocket.remove(SeletedListSocket);
+						JOptionPane.showMessageDialog(contentPane, "Đã Ngắt Kết Nối", "Thông Báo",
+								JOptionPane.DEFAULT_OPTION);
+						modelsocket.fireTableDataChanged();
+						socket.close();
+					}
+					else {
+						JOptionPane.showMessageDialog(contentPane,"Vui Lòng Chọn Socket Để Ngắt...");
+					}
+				} catch (Exception e2) {
+					// TODO: handle exception
+				}
+			}
+		});
+		btnNKN.setBounds(1372, 285, 137, 25);
+		contentPane.add(btnNKN);
+
+		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(754, 112, 96, 64);
+		contentPane.add(scrollPane_2);
+
+		JPanel panel_2 = new JPanel();
+		scrollPane_2.setViewportView(panel_2);
+		panel_2.setLayout(null);
+
+		JLabel lblTrngThi = new JLabel("Trạng Thái");
+		lblTrngThi.setBounds(8, 7, 75, 15);
+		panel_2.add(lblTrngThi);
+
+		lblTt = new JLabel("tắt");
+		lblTt.setBounds(29, 28, 75, 15);
+		panel_2.add(lblTt);
+
+		JButton btnNewButton = new JButton("Gửi Thông Tin");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Thread th1 = new Thread() {
+					@Override
+					public void run() {
+						int seletedVlistsocket = tableSocket.getSelectedRow();
+						if(seletedVlistsocket >= 0) {
+							Vector row = (Vector) vListSocket.get(seletedVlistsocket);
+							Socket socket = (Socket) row.get(0);
+							NapThongTin(socket);
+							QuanTriGui qtg = new QuanTriGui(socket, GuiDuLieu);
+							qtg.start();
+						}
+						else {
+							JOptionPane.showMessageDialog(contentPane,"Vui Lòng Chọn Socket Để Gửi");
+						}
+					}
+				};
+				th1.start();
+			}
+		});
+		btnNewButton.setBounds(1146, 285, 137, 25);
+		contentPane.add(btnNewButton);
+
+		JButton btnNewButton_2 = new JButton("XEM YÊU CẦU");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selectRowSocket = tableSocket.getSelectedRow();
+				if(selectRowSocket >= 0) {
+					suatai = selectRowSocket;
+					Vector row = (Vector) vListSocket.get(selectRowSocket);
+					Socket socket = (Socket) row.get(0);
+					DuThongTinUpDateLentextField(socket);
+				}
+				else {
+					JOptionPane.showMessageDialog(contentPane,"Vui Lòng Chọn Socket Để  Xem");
+				}
+			}
+
+			private void DuThongTinUpDateLentextField(Socket socket) {
+				int size = vCapNhat.size();
+				for (int i = 0; i < size; i++) {
+					Vector row = (Vector) vCapNhat.get(i);
+					Socket socketUD = (Socket) row.get(0);
+					if (socket == socketUD) {
+						tfHOTEN.setText(row.get(1).toString());
+						tfNOITHUONGTRU.setText(row.get(2).toString());
+						tfCMND.setText(row.get(3).toString());
+						if (row.get(4).toString().equalsIgnoreCase("nam")) {
+							comboBox.setSelectedIndex(1);
+						} else if (row.get(4).toString().equalsIgnoreCase("nữ")) {
+							comboBox.setSelectedIndex(2);
+						}
+						tfTENXE.setText(row.get(5).toString());
+						tfBIENSO.setText(row.get(6).toString());
+						tfSOCN.setText(row.get(7).toString());
+						tfNHHIEU.setText(row.get(8).toString());
+						tfSDT.setText(row.get(9).toString());
+						Date date = Date.valueOf(row.get(10).toString());
+					}
+				}
+			}
+		});
+		btnNewButton_2.setBounds(860, 285, 197, 25);
+		contentPane.add(btnNewButton_2);
+
+		JButton btnNewButton_3 = new JButton("Đồng Ý");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (suatai >= 0) {
+					int indexCbb = comboBox.getSelectedIndex();
+					int indexSelectRow = suatai;
+					Vector row = (Vector) vListSocket.get(indexSelectRow);
+					Socket socket = (Socket) row.get(0);
+					DongYSua(indexCbb, row, socket, row.get(1).toString());
+				} else {
+//					JOptionPane.showConfirmDialog(contentPane,"C", GuiDuLieu, ALLBITS, ABORT)
+				}
+
+			}
+
+			private void DongYSua(int indexCbb, Vector row, Socket socket, String lenh) {
+				try {
+					if (lenh.equalsIgnoreCase("cập nhật")) {
+						prst = conn.prepareStatement(sqlUpdate);
+						prst.setString(1, tfHOTEN.getText().toUpperCase());
+						prst.setString(2, tfCMND.getText().toUpperCase());
+						prst.setString(3, tfNOITHUONGTRU.getText().toUpperCase());
+						if (indexCbb == 1) {
+							prst.setString(4, "NAM");
+						} else if (indexCbb == 2) {
+							prst.setString(4, "NỮ");
+						}
+						prst.setString(5, tfTENXE.getText().toUpperCase());
+						prst.setString(6, tfBIENSO.getText().toUpperCase());
+						prst.setString(7, tfSOCN.getText().toUpperCase());
+						prst.setString(8, tfNHHIEU.getText().toUpperCase());
+						prst.setString(9, tfSDT.getText().toUpperCase());
+						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+						prst.setString(11, row.get(3).toString().toUpperCase());
+						if (prst.executeUpdate() > 0) {
+							JOptionPane.showInternalMessageDialog(contentPane, "Đã Sửa", "Thông Báo",
+									JOptionPane.DEFAULT_OPTION);
+							capnhattrangthai(socket, "Đã Cập Nhật");
+							QuanTriGui qtg = new QuanTriGui(socket, "[Đã Sửa]");
+							qtg.start();
+							NapDulieutuDATABASE();
+						}
+					} else if (lenh.equalsIgnoreCase("Đăng Ký")) {
+						System.out.println("vào đăng ký");
+						prst = conn.prepareStatement(sqlInserAll);
+						prst.setString(1, tfHOTEN.getText().toUpperCase());
+						prst.setString(2, tfCMND.getText().toUpperCase());
+						prst.setString(3, tfNOITHUONGTRU.getText().toUpperCase());
+						if (indexCbb == 1) {
+							prst.setString(4, "NAM");
+						} else if (indexCbb == 2) {
+							prst.setString(4, "NỮ");
+						}
+						prst.setString(5, tfTENXE.getText().toUpperCase());
+						prst.setString(6, tfBIENSO.getText().toUpperCase());
+						prst.setString(7, tfSOCN.getText().toUpperCase());
+						prst.setString(8, tfNHHIEU.getText().toUpperCase());
+						prst.setString(9, tfSDT.getText().toUpperCase());
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+						if (prst.executeUpdate() > 0) {
+							JOptionPane.showMessageDialog(contentPane, "Thành Công");
+							NapDulieutuDATABASE();
+							QuanTriGui qtg = new QuanTriGui(socket, "[đăng ký thành công]");
+							qtg.start();
+							capnhattrangthai(socket, "Đăng ký Thành Công");
+						}
+					}
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(contentPane, "Tồn Tại Biển Số");
+					QuanTriGui qtg = new QuanTriGui(socket, "[đăng ký Thất Bại]");
+					qtg.start();
+//					e.printStackTrace();
+				}
+			}
+		});
+		btnNewButton_3.setBounds(742, 285, 117, 25);
+		contentPane.add(btnNewButton_3);
+
+	}
+
+	public void napthongtinuser() {
+		try {
+			vTitlelistsocket.add("Soket Đang Kết Nối...");
+			vTitlelistsocket.add("Yêu Cầu");
+			vTitlelistsocket.add("Trạng Thái");
+			vTitlelistsocket.add("Biển Số");
+			vTitlelistsocket.add("Trạng Thái Biển Số");
+		} catch (Exception e) {
+			// TODO: handle exception8
+		}
+
+	}
+
+	private void truyvanDATABASE(String sms) {
+		try {
+			vData.clear();
+			vTitle.clear();
+			PreparedStatement prst1 = conn.prepareStatement(sqlLIKEAll);
+			prst1.setString(1, "%" + sms + "%");
+			prst1.setString(2, "%" + sms + "%");
+			prst1.setString(3, "%" + sms + "%");
+			prst1.setString(4, "%" + sms + "%");
+			prst1.setString(5, "%" + sms + "%");
+			prst1.setString(6, "%" + sms + "%");
+			prst1.setString(7, "%" + sms + "%");
+			prst1.setString(8, "%" + sms + "%");
+			prst1.setString(9, "%" + sms + "%");
+			prst1.setString(10, "%" + sms + "%");
+			ResultSet rst = prst1.executeQuery();
+			ResultSetMetaData rstm = rst.getMetaData();
+			int col = rstm.getColumnCount();
+			for (int i = 1; i <= col; i++) {
+				vTitle.add(rstm.getColumnName(i));
+			}
+			while (rst.next()) {
+				Vector row = new Vector();
+				for (int i = 1; i <= col; i++) {
+					row.add(rst.getString(i));
+				}
+				vData.add(row);
+			}
+			JOptionPane.showMessageDialog(contentPane, "Tìm Thấy " + vData.size() + " Kết Quả", "Thông Báo",
+					JOptionPane.DEFAULT_OPTION);
+			model.fireTableDataChanged();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void truyVan(Socket socket) {
+		try {
+			int trunglap = 0;
+			int trungtai = -1;
+			int kiemtraketqua = 0;
+			PreparedStatement prst1 = conn.prepareStatement(sqlLIKESocket);
+			prst1.setString(1, LikeCMND);
+			prst1.setString(2, LIkeBienSo);
+			ResultSet rst = prst1.executeQuery();
+			ResultSetMetaData rstm = rst.getMetaData();
+			int col = rstm.getColumnCount();
+			int size = vLuuVaPhanHoiYeuCauTruyVan.size();
+			// nếu chưa có socket nào hêt
+			if (size == 0) {
+				Vector row = new Vector();
+				row.add(socket);
+				while (rst.next()) {
+					kiemtraketqua = 1;
+					for (int i = 1; i <= col; i++) {
+						row.add(rst.getString(i));
+					}
+					vLuuVaPhanHoiYeuCauTruyVan.add(row);
+				}
+				// nếu đã có socket và sẽ kiểm tra xem socket này có tồn tại chưa
+			} else {
+				for (int i = 0; i < size; i++) {
+					Vector row = (Vector) vLuuVaPhanHoiYeuCauTruyVan.get(i);
+					Socket socketCheck = (Socket) row.get(0);
+					if (socketCheck == socket) {
+						trunglap = 1;
+						trungtai = i;
+					}
+				}
+				// nếu không có trùng lặp thì thêm mới
+				if (trunglap == 0) {
+					Vector row = new Vector();
+					row.add(socket);
+					while (rst.next()) {
+						kiemtraketqua = 1;
+						for (int i = 1; i <= col; i++) {
+							row.add(rst.getString(i));
+						}
+						vLuuVaPhanHoiYeuCauTruyVan.add(row);
+					}
+					// nếu đã có socket thì chỉ cần thay thế nội dung là được
+				} else if (trunglap == 1) {
+					Vector row = new Vector();
+					row.add(socket);
+					while (rst.next()) {
+						kiemtraketqua = 1;
+						for (int i = 1; i <= col; i++) {
+							row.add(rst.getString(i));
+						}
+						vLuuVaPhanHoiYeuCauTruyVan.set(trungtai, row);
+					}
+				}
+			}
+			if (kiemtraketqua == 1) {
+				capnhattrangthai(socket, "Tồn Tại");
+				QuanTriGui qtg = new QuanTriGui(socket, "Tồn Tại");
+				qtg.start();
+			} else {
+				capnhattrangthai(socket, "Không Tồn Tại");
+				QuanTriGui qtg = new QuanTriGui(socket, "Không Tồn Tại");
+				
+				qtg.start();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	private void capnhattrangthai(Socket socket, String lenh) {
+		int size = vListSocket.size();
+		if (lenh.equalsIgnoreCase("Đã Thoát")) {
+			for (int i = 0; i < size; i++) {
+				Vector row = (Vector) vListSocket.get(i);
+				Socket socketList = (Socket) row.get(0);
+				if (socket == socketList) {
+					vListSocket.remove(i);
+					JOptionPane.showMessageDialog(contentPane, "socket = " + socket + "Đã Thoát", "Thông Báo",
+							JOptionPane.ERROR_MESSAGE);
+				}
+				modelsocket.fireTableDataChanged();
+			}
+		} else if (lenh.equalsIgnoreCase("Đăng Ký")) {
+			for (int i = 0; i < size; i++) {
+				Vector row = (Vector) vListSocket.get(i);
+				Socket socketlist = (Socket) row.get(0);
+				if (socket == socketlist) {
+					row.set(1, "Đăng Ký");
+					row.set(3, "Đăng Ký...");
+					row.set(4, "Đăng Ký...");
+				}
+				vListSocket.set(i, row);
+			}
+
+		} else if (lenh.equalsIgnoreCase("Cập Nhật")) {
+			for (int i = 0; i < size; i++) {
+				Vector row = (Vector) vListSocket.get(i);
+				Socket socketlist = (Socket) row.get(0);
+				if (socket == socketlist) {
+					row.set(1, lenh);
+				}
+				vListSocket.set(i, row);
+			}
+
+		} else if (lenh.equalsIgnoreCase("Đăng ký Thành Công")) {
+			for (int i = 0; i < size; i++) {
+				Vector row = (Vector) vListSocket.get(i);
+				Socket socketlist = (Socket) row.get(0);
+				if (socket == socketlist) {
+					row.set(1, "Đăng Ký Thành Công");
+					row.set(3, tfBIENSO.getText().toUpperCase());
+					row.set(4, "Đăng Ký Thành Công");
+				}
+				vListSocket.set(i, row);
+			}
+		}else if(lenh.equalsIgnoreCase("Đã Cập Nhật")) { 
+			for (int i = 0; i < size; i++) {
+				Vector row = (Vector) vListSocket.get(i);
+				Socket socketList = (Socket) row.get(0);
+				if (socket == socketList) {
+					row.set(1, lenh);
+					row.set(3, tfBIENSO.getText().toUpperCase());
+					vListSocket.set(i, row);
+				}
+			}			
+		}
+		else {
+			for (int i = 0; i < size; i++) {
+				Vector row = (Vector) vListSocket.get(i);
+				Socket socketList = (Socket) row.get(0);
+				if (socket == socketList) {
+					row.set(4, lenh);
+					vListSocket.set(i, row);
+				}
+			}
+		}
+		modelsocket.fireTableDataChanged();
+
+	}
+
+	private void NapThongTin(Socket socket) {
+		try {
+			GuiDuLieu = "";
+			int size = vLuuVaPhanHoiYeuCauTruyVan.size();
+			for(int i = 0 ; i < size ; i++) {
+				Vector row = (Vector) vLuuVaPhanHoiYeuCauTruyVan.get(i);
+				Socket socketYC = (Socket) row.get(0);
+				if(socket == socketYC) {
+					System.out.println(row);
+					int sizeCon = row.size();
+					for(int j = 1 ; j < sizeCon ; j++) {
+						if(j == ( sizeCon - 1)) {
+							GuiDuLieu = GuiDuLieu + row.get(j).toString();
+						}else {
+							GuiDuLieu = GuiDuLieu + row.get(j).toString() + ",";
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class QuanTriDoc extends Thread {
+	private Socket socket;
+
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public void setSocket(Socket socket) {
+		this.socket = socket;
+	}
+
+	public String getHoten() {
+		return hoten;
+	}
+
+	public void setHoten(String hoten) {
+		this.hoten = hoten;
+	}
+
+	public String getNoithuongtru() {
+		return noithuongtru;
+	}
+
+	public void setNoithuongtru(String noithuongtru) {
+		this.noithuongtru = noithuongtru;
+	}
+
+	public String getCmnd() {
+		return cmnd;
+	}
+
+	public void setCmnd(String cmnd) {
+		this.cmnd = cmnd;
+	}
+
+	public String getGioitinh() {
+		return gioitinh;
+	}
+
+	public void setGioitinh(String gioitinh) {
+		this.gioitinh = gioitinh;
+	}
+
+	public String getTenxe() {
+		return tenxe;
+	}
+
+	public void setTenxe(String tenxe) {
+		this.tenxe = tenxe;
+	}
+
+	public String getBienso() {
+		return bienso;
+	}
+
+	public void setBienso(String bienso) {
+		this.bienso = bienso;
+	}
+
+	public String getSochongoi() {
+		return sochongoi;
+	}
+
+	public void setSochongoi(String sochongoi) {
+		this.sochongoi = sochongoi;
+	}
+
+	public String getNhanhieu() {
+		return nhanhieu;
+	}
+
+	public void setNhanhieu(String nhanhieu) {
+		this.nhanhieu = nhanhieu;
+	}
+
+	public String getSodienthoai() {
+		return sodienthoai;
+	}
+
+	public void setSodienthoai(String sodienthoai) {
+		this.sodienthoai = sodienthoai;
+	}
+
+	public String getngaydangky() {
+		return ngaydangky;
+	}
+
+	public void setngaydangky(String ngaydangky) {
+		this.ngaydangky = ngaydangky;
+	}
+
+	private String sms;
+
+	public String getSms() {
+		return sms;
+	}
+
+	public void setSms(String sms) {
+		this.sms = sms;
+	}
+
+	private String hoten;
+	private String cmnd;
+	private String noithuongtru;
+	private String gioitinh;
+	private String tenxe;
+	private String bienso;
+	private String sochongoi;
+	private String nhanhieu;
+	private String sodienthoai;
+	private String ngaydangky;
+	private String YeuCau = "";
+
+	public String getYeuCau() {
+		return YeuCau;
+	}
+
+	public void setYeuCau(String yeuCau) {
+		YeuCau = yeuCau;
+	}
+
+	public String getNdHT() {
+		return ndHT;
+	}
+
+	public void setNdHT(String ndHT) {
+		this.ndHT = ndHT;
+	}
+
+	public String getNdBS() {
+		return ndBS;
+	}
+
+	public void setNdBS(String ndBS) {
+		this.ndBS = ndBS;
+	}
+
+	private String ndHT = "";
+	private String ndBS = "";
+
+	public QuanTriDoc(Socket socket) {
+		this.socket = socket;
+	}
+
+	@Override
+	public void run() {
+		DataInputStream in = null;
+		try {
+			while (true) {
+				in = new DataInputStream(socket.getInputStream());
+				sms = in.readUTF();
+				if (sms != null) {
+					if (sms.contains("sqltruyvan")) {
+						TachChuoi();
+					} else if (sms.contains("update") || sms.contains("insert")) {
+						TachChuoiUpdate();
+					}
+				}
+			}
+		} catch (Exception e) {
+			try {
+				in.close();
+			} catch (Exception e2) {
+				// TODO: handle exception
+			}
+		}
+	}
+
+	private void TachChuoiUpdate() {
+		LamMoi1();
+		int size = sms.length();
+		int index = 0;
+		for (int i = 0; i < size; i++) {
+			if (sms.charAt(i) == ',') {
+				index = index + 1;
+				continue;
+			}
+			if (index == 0) {
+				YeuCau = YeuCau + sms.charAt(i);
+			}
+			if (index == 1) {
+				hoten = hoten + sms.charAt(i);
+			}
+			if (index == 2) {
+				cmnd = cmnd + sms.charAt(i);
+			}
+			if (index == 3) {
+				noithuongtru = noithuongtru + sms.charAt(i);
+			}
+			if (index == 4) {
+				gioitinh = gioitinh + sms.charAt(i);
+			}
+			if (index == 5) {
+				tenxe = tenxe + sms.charAt(i);
+			}
+			if (index == 6) {
+				bienso = bienso + sms.charAt(i);
+			}
+			if (index == 7) {
+				sochongoi = sochongoi + sms.charAt(i);
+			}
+			if (index == 8) {
+				nhanhieu = nhanhieu + sms.charAt(i);
+			}
+			if (index == 9) {
+				sodienthoai = sodienthoai + sms.charAt(i);
+			}
+			if (index == 10) {
+				ngaydangky = ngaydangky + sms.charAt(i);
+			}
+		}
+	}
+
+	private void LamMoi1() {
+		hoten = "";
+		cmnd = "";
+		noithuongtru = "";
+		gioitinh = "";
+		tenxe = "";
+		bienso = "";
+		sochongoi = "";
+		nhanhieu = "";
+		sodienthoai = "";
+		ngaydangky = "";
+		YeuCau = "";
+	}
+
+	public void TachChuoi() {
+		ndBS = "";
+		ndHT = "";
+		YeuCau = "";
+		int size = sms.length();
+		int index = -1;
+		for (int i = 0; i < size; i++) {
+			if (sms.charAt(i) == ',') {
+				index = index + 1;
+				continue;
+			}
+			if (index == -1) {
+				YeuCau = YeuCau + sms.charAt(i);
+			}
+			if (index == 0) {
+				ndBS = ndBS + sms.charAt(i);
+			}
+			if (index == 1) {
+				ndHT = ndHT + sms.charAt(i);
+			}
+		}
+	}
+}
+
+class QuanTriGui extends Thread {
+	Socket socket;
+	String nd;
+
+	public QuanTriGui(Socket socket, String nd) {
+		this.socket = socket;
+		this.nd = nd;
+	}
+
+	@Override
+	public void run() {
+		try {
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			out.writeUTF(nd);
+			out.flush();
+//			System.out.println("da gui ");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+	}
+}

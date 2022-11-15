@@ -100,6 +100,7 @@ public class LoginView {
 		frame.setBounds(100, 100, 1206, 598);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		frame.setResizable(false);
 		
 		JLabel lblImageMain = new JLabel();
 		lblImageMain.setBounds(12, 0, 742, 548);

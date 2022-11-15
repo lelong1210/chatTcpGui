@@ -1,9 +1,0 @@
-package server;
-
-//class này là dùng để khởi động
-public class ServerTransferMain {
- public static void main(String[] args) {
- 	ServerTransferView view = new ServerTransferView();
-     new ServerTransferController(view);
- }
-}
