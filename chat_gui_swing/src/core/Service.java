@@ -14,6 +14,7 @@ public class Service {
 	private Connection conn;
 	private PreparedStatement prst;
 	private ArrayList<MessInfo> vData, vTitle;
+	private ArrayList<UserInfo> vUser;
 
 	public Service() {
 		connectDB();
@@ -25,6 +26,7 @@ public class Service {
 			this.conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/projectJava", "root", "");
 			vData = new ArrayList<>();
 			vTitle = new ArrayList<>();
+			vUser = new ArrayList<>();
 		} catch (Exception e) {
 
 		}
@@ -48,6 +50,29 @@ public class Service {
 		return false;
 	}
 
+	public ArrayList<UserInfo> getListUser() {
+		try {
+			if (vUser != null) {
+				vUser.clear();
+			}
+
+			String getUser = "SELECT username,status FROM user WHERE 1";
+
+			prst = conn.prepareStatement(getUser);
+			ResultSet rst = prst.executeQuery();
+			
+			while (rst.next()) {
+				UserInfo userInfo = new UserInfo(null, rst.getString(1),rst.getInt(2));
+				vUser.add(userInfo);				
+			}
+			return vUser;
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return vUser;
+	}
+
 	public ArrayList<MessInfo> getMessInfo(String username) {
 		try {
 			if (vData != null) {
@@ -56,27 +81,24 @@ public class Service {
 			}
 
 			String Login = "SELECT id, userSource, userDes, messContent, time, file FROM messInfo WHERE messInfo.userDes = ? OR messInfo.userSource = ?";
-			try {
-				prst = conn.prepareStatement(Login);
-				prst.setString(1, username);
-				prst.setString(2, username);
-				ResultSet rst = prst.executeQuery();
-				ResultSetMetaData rstm = rst.getMetaData();
-				while (rst.next()) {
-					MessInfo messInfo = new MessInfo(rst.getString(2), rst.getString(3), rst.getString(4),
-							rst.getString(5), null);
-					vData.add(messInfo);
 
-					if (rst.getString(6) != null) {
-						FileInfo fileInfo = getFileInfo(rst.getString(6), "/home/lql/Desktop/");
-						messInfo.setFileInfo(fileInfo);
-					}
+			prst = conn.prepareStatement(Login);
+			prst.setString(1, username);
+			prst.setString(2, username);
+			ResultSet rst = prst.executeQuery();
+			ResultSetMetaData rstm = rst.getMetaData();
+			while (rst.next()) {
+				MessInfo messInfo = new MessInfo(rst.getString(2), rst.getString(3), rst.getString(4), rst.getString(5),
+						null);
+				vData.add(messInfo);
+
+				if (rst.getString(6) != null) {
+					FileInfo fileInfo = getFileInfo(rst.getString(6), "");
+					messInfo.setFileInfo(fileInfo);
 				}
-
-				return vData;
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
 			}
+
+			return vData;
 
 		} catch (Exception e) {
 			// TODO: handle exception

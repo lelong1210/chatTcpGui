@@ -30,6 +30,14 @@ import event.PublicEvent;
 // class này là nhân của server
 public class TCPServer extends Thread {
 	private Service service;
+	public Service getService() {
+		return service;
+	}
+
+	public void setService(Service service) {
+		this.service = service;
+	}
+
 	// khai báo biến serversocket
 	private ServerSocket serverSocket;
 	// cổng 9900
@@ -38,8 +46,9 @@ public class TCPServer extends Thread {
 	private JTextArea textAreaLog;
 	// mảng các User
 	private ArrayList<UserInfo> arrayListUser = new ArrayList<UserInfo>();
-	//
-	private ServerGuiView serverGuiView;
+	// mang user in database
+
+
 
 	public ArrayList<UserInfo> getArrayListUser() {
 		return arrayListUser;
@@ -54,7 +63,8 @@ public class TCPServer extends Thread {
 		this.port = port;
 		this.service = new Service();
 		this.textAreaLog = textAreaLog;
-		this.serverGuiView = serverGuiView;
+		
+
 	}
 
 	// function dùng để mở cửa server
@@ -90,17 +100,19 @@ public class TCPServer extends Thread {
 							// get input from client
 							while (true) {
 								Object object = ois.readObject();
-
+								// if object is Logout
 								if (object instanceof ExitOrLogout) {
 									ExitOrLogout exitOrLogout = (ExitOrLogout) object;
 									for (UserInfo userInfo : arrayListUser) {
 										if (userInfo.getUsername().equals(exitOrLogout.getUsername())) {
+											// update user trong ban khi exit thanh cong
 											arrayListUser.remove(arrayListUser.indexOf(userInfo));
-											serverGuiView.UpdateUserLoginInSystem(arrayListUser);
+//											serverGuiView.UpdateUserLoginInSystem(arrayListUser);
+											PublicEvent.getInstance().getEventServer().UpdateStatusUserLoginInSystem(arrayListUser);
 										}
 									}
 								}
-
+								// if object is LoginOrRegister
 								if (object instanceof LoginRegisterMessInfo) {
 
 									ArrayList<MessInfo> arraylistMessInfo = new ArrayList<>();
@@ -114,20 +126,20 @@ public class TCPServer extends Thread {
 												loginRegisterMessInfo.getPassword())
 												&& checkUserLogin(loginRegisterMessInfo.getUsername())) {
 											userNameLogin = loginRegisterMessInfo.getUsername();
-											userInfo = new UserInfo(client, userNameLogin);
+											userInfo = new UserInfo(client, userNameLogin,1);
 											arrayListUser.add(userInfo);
 
 											arraylistMessInfo = service.getMessInfo(userNameLogin);
 
 											loginRegisterMessInfo.setArraylistMessInfo(arraylistMessInfo);
 											loginRegisterMessInfo.setStatus(true);
-
-											serverGuiView.UpdateUserLoginInSystem(arrayListUser);
+											// update user trong ban khi login thanh cong
+											PublicEvent.getInstance().getEventServer().UpdateStatusUserLoginInSystem(arrayListUser);
 
 										} else {
 											loginRegisterMessInfo.setStatus(false);
 										}
-										// option is register
+									// option is register
 									} else {
 										if (service.Register(loginRegisterMessInfo.getUsername(),
 												loginRegisterMessInfo.getPassword())) {
@@ -141,7 +153,7 @@ public class TCPServer extends Thread {
 									sendMess(oos, loginRegisterMessInfo);
 									oos = null;
 								}
-
+								// if Object is MessInfo
 								if (object instanceof MessInfo) {
 
 									MessInfo messInfo = (MessInfo) object;
@@ -192,30 +204,13 @@ public class TCPServer extends Thread {
 											messInfo.getMessContent(), messInfo.getTime(), pathFile);
 								}
 								//
-							      PublicEvent.getInstance().addeventServer(new EventServer() {
-										
-										@Override
-										public void UpdateUser(String username, int option) {
-											// TODO Auto-generated method stub
-											
-										}
-										
-										@Override
-										public void SelectTableUser() {
-											// TODO Auto-generated method stub
-											
-										}
-										
-										@Override
-										public void Adduser(String username, String Password) {
-											// TODO Auto-generated method stub
-											System.out.println("User In syste");
-										}
-									});
 
 							}
 						} catch (Exception e) {
-							System.out.println("try catch tcp server " + e.getMessage());
+//							System.out.println("try catch tcp server " + e.getMessage());
+							closeStream(ois);
+							closeStream(oos);
+							closeSocket(client);
 						}
 					}
 				};

@@ -13,6 +13,7 @@ import javax.swing.table.DefaultTableModel;
 
 import core.UserInfo;
 import event.PublicEvent;
+import guiCore.*;
 
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -39,9 +40,25 @@ public class ServerGuiView extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtUsername;
-	private JTextField textField_8;
-	private ArrayList<String> arrayUser = new ArrayList<>();
+
+	public JTextField getTxtUsername() {
+		return txtUsername;
+	}
+
+	public void setTxtUsername(JTextField txtUsername) {
+		this.txtUsername = txtUsername;
+	}
+
 	private DefaultTableModel model;
+	private JComboBox<String> txtComboBoxStatus;
+
+	public JComboBox<String> getTxtComboBoxStatus() {
+		return txtComboBoxStatus;
+	}
+
+	public void setTxtComboBoxStatus(JComboBox<String> txtComboBoxStatus) {
+		this.txtComboBoxStatus = txtComboBoxStatus;
+	}
 
 	public DefaultTableModel getModel() {
 		return model;
@@ -51,7 +68,7 @@ public class ServerGuiView extends JFrame {
 		this.model = model;
 	}
 
-	private JTable tableSocket;
+	private JTable tableUserLogin;
 	private JTextArea textAreaResult;
 
 	public JTextArea getTextAreaResult() {
@@ -112,13 +129,10 @@ public class ServerGuiView extends JFrame {
 		JLabel lblNewLabel_2 = new JLabel("Status");
 		lblNewLabel_2.setBounds(33, 66, 64, 15);
 		panel_1.add(lblNewLabel_2);
-		textField_8 = new JTextField();
-		textField_8.setColumns(10);
 
-		JComboBox<String> txtComboBoxStatus = new JComboBox<>();
-		txtComboBoxStatus.addItem("");
-		txtComboBoxStatus.addItem("Active");
+		txtComboBoxStatus = new JComboBox<>();
 		txtComboBoxStatus.addItem("Block");
+		txtComboBoxStatus.addItem("Active");
 		txtComboBoxStatus.setBounds(182, 61, 165, 24);
 		panel_1.add(txtComboBoxStatus);
 
@@ -134,7 +148,7 @@ public class ServerGuiView extends JFrame {
 				}
 			}
 		});
-		btnAddUser.setBounds(94, 99, 117, 25);
+		btnAddUser.setBounds(34, 99, 117, 25);
 		contentPane.add(btnAddUser);
 
 		JButton btnUpdateUser = new JButton("Update");
@@ -143,7 +157,7 @@ public class ServerGuiView extends JFrame {
 
 			}
 		});
-		btnUpdateUser.setBounds(223, 99, 117, 25);
+		btnUpdateUser.setBounds(153, 99, 117, 25);
 		contentPane.add(btnUpdateUser);
 
 //		model = new DefaultTableModel(vData, vTitle);
@@ -162,10 +176,11 @@ public class ServerGuiView extends JFrame {
 		ArrayList<String> arrCols = new ArrayList<String>();
 		arrCols.add("Username");
 		arrCols.add("Status");
+		arrCols.add("Chat");
 		model.setColumnIdentifiers(arrCols.toArray());
 
-		tableSocket = new JTable(model);
-		tableSocket.addMouseListener(new MouseListener() {
+		tableUserLogin = new JTable(model);
+		tableUserLogin.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -193,18 +208,35 @@ public class ServerGuiView extends JFrame {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				// get thong tin cot name
+				int col = 0;
+				int row = tableUserLogin.getSelectedRow();
+				String username = (String) tableUserLogin.getModel().getValueAt(row, col);
+				// get thong tin cot status
+				col = 1;
+				row = tableUserLogin.getSelectedRow();
+				String status = (String) tableUserLogin.getModel().getValueAt(row, col);
+				PublicEvent.getInstance().getEventServer().SelectTableUser(username, status);
 
 			}
 		});
-		scrollPane_1.setViewportView(tableSocket);
+		scrollPane_1.setViewportView(tableUserLogin);
 
 		JButton btnKick = new JButton("Kick");
 		btnKick.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				// get thong tin cot name
+				int col = 0;
+				int row = tableUserLogin.getSelectedRow();
+				String username = (String) tableUserLogin.getModel().getValueAt(row, col);
+				// get thong tin cot status
+				col = 1;
+				row = tableUserLogin.getSelectedRow();
+				String status = (String) tableUserLogin.getModel().getValueAt(row, col);
+				PublicEvent.getInstance().getEventServer().KickUser(username, status);
 			}
 		});
-		btnKick.setBounds(585, 421, 137, 25);
+		btnKick.setBounds(272, 99, 137, 25);
 		contentPane.add(btnKick);
 
 		textAreaResult = new JTextArea();
@@ -248,21 +280,42 @@ public class ServerGuiView extends JFrame {
 		return arrayListUser;
 	}
 
-	public void UpdateUserLoginInSystem(ArrayList<UserInfo> userInfo) {
+	public void UpdateUserLoginInSystem(ArrayList<UserInfo> userInfo, ArrayList<UserInfo> userInfoSystem) {
+		//
+
 		// reload
 		if (model.getRowCount() > 0) {
 			for (int i = model.getRowCount() - 1; i > -1; i--) {
 				model.removeRow(i);
 			}
 		}
-		// load data
+		// load data in database
 		ArrayList<String> arrRows = new ArrayList<String>();
 		for (int i = 0; i < userInfo.size(); i++) {
 			arrRows.add(userInfo.get(i).getUsername());
-			arrRows.add("Active");
+			arrRows.add("No Login");
 			model.addRow(arrRows.toArray());
 			arrRows.clear();
 		}
+		// update status
+		for (int i = 0; i < userInfoSystem.size(); i++) {
+			for (int j = 0; j < userInfo.size(); j++) {
+				if (userInfoSystem.get(i).getUsername().equals(userInfo.get(j).getUsername())) {
+					model.setValueAt("Loging", j, 1);
+				}
+			}
+		}
+		// update "..." chat
+		for (int i = 0; i < userInfo.size(); i++) {
+			model.setValueAt("Chat", i, 2);
+		}
+		
+		  //SET CUSTOM RENDERER TO TEAMS COLUMN
+		  tableUserLogin.getColumnModel().getColumn(2).setCellRenderer(new ButtonRenderer());;
+
+		  //SET CUSTOM EDITOR TO TEAMS COLUMN
+		  tableUserLogin.getColumnModel().getColumn(2).setCellEditor(new ButtonEditor(new JTextField()));
+		
 		// load data
 		model.fireTableDataChanged();
 	}

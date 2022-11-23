@@ -1,7 +1,0 @@
-package core;
-
-public class ExitOrLogout {
-	private int option;
-	private String username;
-	
-}

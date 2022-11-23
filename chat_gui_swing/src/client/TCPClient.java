@@ -19,8 +19,8 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import chat.Chat_Body;
-import chat.Chat_Title;
+import chat_gui.Chat_Body;
+import chat_gui.Chat_Title;
 import core.ExitOrLogout;
 import core.FileInfo;
 import core.ListMessChat;

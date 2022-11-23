@@ -5,10 +5,12 @@ import java.net.Socket;
 public class UserInfo {
 	private Socket socket;
 	private String username;
+	private int status;
 
-	public UserInfo(Socket socket, String username) {
+	public UserInfo(Socket socket, String username,int status) {
 		this.socket = socket;
 		this.username = username;
+		this.status = status;
 	}
 
 	public Socket getSocket() {
@@ -25,5 +27,13 @@ public class UserInfo {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 }

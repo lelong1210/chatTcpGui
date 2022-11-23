@@ -1,7 +1,0 @@
-package event;
-
-public interface EventExit {
-	public void sendExitToServer() {
-		
-	};
-}

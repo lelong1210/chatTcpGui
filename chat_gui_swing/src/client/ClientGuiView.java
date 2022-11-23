@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 
 import event.PublicEvent;
 import guiCore.ComponentResizer;
-import guiCore.Home;
+import guiCore.HomeClient;
 
 public class ClientGuiView extends javax.swing.JFrame {
 
@@ -22,18 +22,18 @@ public class ClientGuiView extends javax.swing.JFrame {
     private int pY;
     private javax.swing.JPanel background;
     private javax.swing.JLayeredPane body;
-    public Home getHome() {
+    public HomeClient getHome() {
 		return home;
 	}
 
-	public void setHome(Home home) {
+	public void setHome(HomeClient home) {
 		this.home = home;
 	}
 
 	private javax.swing.JPanel border;
     private javax.swing.JButton cmdClose;
     private javax.swing.JButton cmdMinimize;
-    private Home home;
+    private HomeClient home;
     private javax.swing.JPanel title;
 
     public ClientGuiView() {
@@ -86,7 +86,7 @@ public class ClientGuiView extends javax.swing.JFrame {
         cmdMinimize = new javax.swing.JButton();
         cmdClose = new javax.swing.JButton();
         body = new javax.swing.JLayeredPane();
-        home = new Home();
+        home = new HomeClient();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);

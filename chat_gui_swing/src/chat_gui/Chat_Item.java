@@ -1,0 +1,151 @@
+package chat_gui;
+
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorListener;
+
+import core.MessInfo;
+import event.PublicEvent;
+import guiCore.*;
+
+public class Chat_Item extends javax.swing.JLayeredPane {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JLabel label;
+	private MessInfo messInfo;
+
+	public Chat_Item(MessInfo messInfo) {
+		this.messInfo = messInfo;
+		initComponents();
+		txt.setEditable(false);
+		txt.setBackground(new Color(0, 0, 0, 0));
+		txt.setOpaque(false);
+	}
+
+	public void setText(String text) {
+		txt.setText(text);
+	}
+
+	public void setTime(String time) {
+		JLayeredPane layer = new JLayeredPane();
+		layer.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+		layer.setBorder(new EmptyBorder(0, 5, 10, 5));
+		label = new JLabel(time);
+		label.setForeground(new Color(110, 110, 110));
+		label.setHorizontalTextPosition(JLabel.LEFT);
+		layer.add(label);
+		add(layer);
+	}
+	public void setTextForButtonDownloadsFile(String fileName) {
+		JLayeredPane layer = new JLayeredPane();
+		layer.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+		layer.setBorder(new EmptyBorder(0, 5, 10, 5));
+		// cach ra neu chieu dai chuoi < 28 :)))
+		if(fileName.length() < 28) {
+			while(fileName.length() < 28) {
+				fileName = fileName + ' ';	
+			}
+		}
+		label = new JLabel(fileName);
+		label.setForeground(new Color(110, 110, 110));
+		label.setIcon(new ImageIcon(getClass().getResource("/client/icon/file.png")));
+		label.setHorizontalTextPosition(JLabel.RIGHT);
+		layer.add(label);
+		add(layer);
+	}
+	public void sendSuccess() {
+		if (label != null) {
+			label.setIcon(new ImageIcon(getClass().getResource("/client/icon/tick.png")));
+		}
+	}
+
+	public void seen() {
+		if (label != null) {
+			label.setIcon(new ImageIcon(getClass().getResource("/client/icon/double_tick.png")));
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	// <editor-fold defaultstate="collapsed" desc="Generated
+	// Code">//GEN-BEGIN:initComponents
+	private void initComponents() {
+
+		txt = new JIMSendTextPane();
+
+		setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.PAGE_AXIS));
+
+		txt.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 5, 10));
+		txt.setSelectionColor(new java.awt.Color(92, 188, 255));
+
+		if (messInfo.getFileInfo() != null) {
+			setTextForButtonDownloadsFile(messInfo.getFileInfo().getFilename());
+		} else {
+			add(txt);
+		}
+
+		addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (messInfo.getFileInfo() != null) {
+					PublicEvent.getInstance().getEventChat().downloadFile(messInfo.getFileInfo());
+				}
+			}
+		});
+	}// </editor-fold>//GEN-END:initComponents
+
+	@Override
+	protected void paintComponent(Graphics grphcs) {
+		Graphics2D g2 = (Graphics2D) grphcs;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setColor(getBackground());
+		g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+		super.paintComponent(grphcs);
+	}
+
+	// Variables declaration - do not modify//GEN-BEGIN:variables
+	private JIMSendTextPane txt;
+	// End of variables declaration//GEN-END:variables
+}
