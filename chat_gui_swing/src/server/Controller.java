@@ -117,6 +117,8 @@ public class Controller implements ActionListener {
 
 			@Override
 			public void UpdateStatusUserLoginInSystem(ArrayList<UserInfo> userInfoInSystem) {
+				// getuser tu database va ve lai bang
+				arrayListUserDatabaseToGUI = tcpServer.getService().getListUser();
 				view.UpdateUserLoginInSystem(arrayListUserDatabaseToGUI, userInfoInSystem);
 			}
 

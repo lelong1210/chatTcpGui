@@ -281,10 +281,12 @@ public class TCPServer extends Thread {
 	}
 
 	public boolean createFile(FileInfo fileInfo) {
+		
+		fileInfo.setDestinationDirectory("/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/");
+		
 		BufferedOutputStream bos = null;
 		try {
-			if (fileInfo != null) {
-
+			if (fileInfo != null) {		
 				File fileReceive = new File(fileInfo.getDestinationDirectory() + fileInfo.getFilename());
 				bos = new BufferedOutputStream(new FileOutputStream(fileReceive));
 				// write file content

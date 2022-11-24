@@ -258,7 +258,7 @@ public class TCPClient {
 
 	public boolean createFile(FileInfo fileInfo) {
 		BufferedOutputStream bos = null;
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss");
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 		LocalDateTime now = LocalDateTime.now();
 		try {
 			if (fileInfo != null) {

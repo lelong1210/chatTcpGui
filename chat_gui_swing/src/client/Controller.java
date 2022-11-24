@@ -174,7 +174,7 @@ public class Controller implements ActionListener {
 
 					if (isSendFile) {
 						String sourceFilePath = text.trim();
-						String destinationDir = "/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/";
+						String destinationDir = "";
 
 						MessInfo messInfo = new MessInfo(username, userDes, text,time, null);
 						tcpClient.sendFile(sourceFilePath, destinationDir, messInfo);
@@ -186,7 +186,7 @@ public class Controller implements ActionListener {
 
 					if (isSendFile) {
 						String sourceFilePath = text.trim();
-						String destinationDir = "/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/";
+						String destinationDir = "";
 
 						MessInfo messInfo = new MessInfo(username, view.getHome().getChat().getChatTitle().getUserDes(),
 								text, time,null);
