@@ -1,0 +1,250 @@
+package client;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.swing.JOptionPane;
+
+import core.ExitOrLogout;
+import core.FileInfo;
+import core.MessInfo;
+import event.EventChat;
+import event.EventExitOrLogout;
+import event.EventLogin;
+import event.PublicEvent;
+import guiCore.*;
+
+public class Controller implements ActionListener {
+	private TCPClient tcpClient;
+	private String host = "localhost";
+	private int port = 9900;
+	private boolean isSendFile = false;
+	private boolean isGetMess = true;
+
+	public Controller(ClientGuiView view, LoginView loginView) {
+		try {
+			// tat gui chat 
+			view.setVisible(false);
+			
+			// loop GUI
+			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					javax.swing.UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+			// khoi tao ket noi toi server
+			tcpClient = new TCPClient(host, port, view.getHome().getChat().getChatBody(), view.getHome().getMenu_Left(),
+					view.getHome().getChat().getChatTitle(),loginView);
+			tcpClient.connectServer();
+			
+
+			PublicEvent.getInstance().addEventLogin(new EventLogin() {
+
+				@Override
+				public void register(String username, String password, String rePassword) {
+
+					if (!username.isBlank() && !password.isEmpty() && !rePassword.isEmpty() && password.equals(rePassword)) {
+						
+						Thread threadLoginOrRegister = new Thread() {
+							public void run() {
+								try {
+									if(tcpClient.LoginOrRegister(username, password, 1)) {//service.login(username, password).size() != 0
+										JOptionPane.showMessageDialog(loginView.getFrame(), "Register Success", "Alert",
+												JOptionPane.DEFAULT_OPTION);
+										loginView.paintLogin();
+									}else {
+										JOptionPane.showMessageDialog(loginView.getFrame(), "Register Failed", "Alert",
+												JOptionPane.WARNING_MESSAGE);
+									}
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+							};
+						};
+						threadLoginOrRegister.start();
+
+					} else {
+						JOptionPane.showMessageDialog(loginView.getFrame(), "Please enter full information", "Alert",
+								JOptionPane.WARNING_MESSAGE);
+					}
+
+				}
+
+				@Override
+				public void login(String username, String password) {
+					// TODO Auto-generated method stub
+					if (!username.isEmpty() && !password.isEmpty()) {
+						
+						Thread threadLoginOrRegister = new Thread() {
+							public void run() {
+								try {
+									if(tcpClient.LoginOrRegister(username, password, 0)) {//service.login(username, password).size() != 0
+										view.setVisible(true);
+										loginView.getFrame().setVisible(false);
+										System.out.println("controller client: start ...");
+										startGUIChat(view, username);
+									}else {
+										JOptionPane.showMessageDialog(loginView.getFrame(), "Login Failed", "Alert",
+												JOptionPane.WARNING_MESSAGE);
+									}
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+							};
+						};
+						threadLoginOrRegister.start();
+						
+					} else {
+						JOptionPane.showMessageDialog(loginView.getFrame(), "Please enter full information", "Alert",
+								JOptionPane.WARNING_MESSAGE);
+					}
+
+				}
+			});
+			PublicEvent.getInstance().addeventExitOrLogout(new EventExitOrLogout() {
+				
+				@Override
+				public void sendExitToServer() {
+					ExitOrLogout exitOrLogout = new ExitOrLogout(tcpClient.getUsername());
+					try {
+						tcpClient.ExitorLogout(exitOrLogout);
+						System.exit(0);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				@Override
+				public void sendLogoutToServer() {
+					ExitOrLogout exitOrLogout = new ExitOrLogout(tcpClient.getUsername());
+					try {
+						tcpClient.ExitorLogout(exitOrLogout);
+						view.setVisible(false);
+						loginView.getFrame().setVisible(true);
+						// tao ket noi moi
+						tcpClient = new TCPClient(host, port, view.getHome().getChat().getChatBody(), view.getHome().getMenu_Left(),
+								view.getHome().getChat().getChatTitle(),null);
+						tcpClient.connectServer();
+						// reload gui chat
+						
+						view.getHome().getChat().getChatTitle().setUserName("Name");
+						view.getHome().getChat().getChatTitle().setUserDes(null);
+						view.getHome().getChat().getChatBody().clearChat();
+						// 
+						isGetMess = false;
+						
+//						System.exit(0);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+			
+		} catch (Exception ex) {
+
+		}
+	}
+
+	public void startGUIChat(ClientGuiView view, String username) {
+		
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				while (isGetMess) {
+					try {
+						tcpClient.getMess();
+					} catch (Exception e) {
+						System.out.println("what "+e.getMessage());
+					}
+				}
+			}
+		};
+		thread.start();
+
+		PublicEvent.getInstance().addEventChat(new EventChat() {
+			@Override
+			public void sendMessage(String text) {
+				DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				LocalDateTime now = LocalDateTime.now();
+				String time = dtf.format(now);
+				
+				String userDes = "";
+
+				if (view.getHome().getChat().getChatTitle().getUserDes() == null) {
+					userDes = JOptionPane.showInputDialog(view, "nhập user bạn muốn nhắn tin");
+					view.getHome().getChat().getChatTitle().setUserDes(userDes);
+					view.getHome().getChat().getChatTitle().setUserName(userDes);
+
+					if (isSendFile) {
+						String sourceFilePath = text.trim();
+						String destinationDir = "/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/";
+
+						MessInfo messInfo = new MessInfo(username, userDes, text,time, null);
+						tcpClient.sendFile(sourceFilePath, destinationDir, messInfo);
+					} else {
+						tcpClient.sendMess(new MessInfo(username, userDes, text,time, null));
+					}
+
+				} else {
+
+					if (isSendFile) {
+						String sourceFilePath = text.trim();
+						String destinationDir = "/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/";
+
+						MessInfo messInfo = new MessInfo(username, view.getHome().getChat().getChatTitle().getUserDes(),
+								text, time,null);
+						tcpClient.sendFile(sourceFilePath, destinationDir, messInfo);
+					} else {
+						tcpClient.sendMess(new MessInfo(username, view.getHome().getChat().getChatTitle().getUserDes(),
+								text,time, null));
+					}
+				}
+
+				refresh(view);
+				isSendFile = false;
+			}
+
+			@Override
+			public void newMessage(String text) {
+				// TODO Auto-generated method stub
+				view.getHome().getChat().getChatTitle().setUserDes(text);
+				view.getHome().getChat().getChatTitle().setUserName(text);
+				view.getHome().getChat().getChatBody().clearChat();
+			}
+
+			@Override
+			public void sendFile() {
+				String path = view.chooseFile();
+				isSendFile = true;
+				view.getHome().getChat().getChatBottom().getTxt().setText(path);
+			}
+
+			@Override
+			public void downloadFile(FileInfo fileInfo) {
+				
+				System.out.println("Download file :" + fileInfo.getFilename());
+				String downloadFileIn = view.chooseFolder(fileInfo.getFilename());
+				fileInfo.setDestinationDirectory(downloadFileIn+"/");
+				tcpClient.createFile(fileInfo);
+				
+			}
+		});
+
+		refresh(view);
+	}
+
+	public void refresh(ClientGuiView view) {
+		view.repaint();
+		view.revalidate();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+}

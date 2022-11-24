@@ -96,74 +96,34 @@ public class TCPClient {
 		}
 	}
 
-	public void getMess() {
-		try {
-			boolean isUserTrue = false;
-			ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
-			MessInfo messInfo = (MessInfo) ois.readObject();
+	public void getMess() throws Exception{
+		
+		
+		boolean isUserTrue = false;
+		
+		ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+		MessInfo messInfo = (MessInfo) ois.readObject();
 
-//			if (messInfo.getFileInfo() != null) {
-//				createFile(messInfo.getFileInfo());
-//			}
+//		if (messInfo.getFileInfo() != null) {
+//			createFile(messInfo.getFileInfo());
+//		}
 
-			this.chat_Title.setUserName(messInfo.getUserSource());
+		this.chat_Title.setUserName(messInfo.getUserSource());
 
-			Item_People item_People = new Item_People(messInfo.getUserSource());
+		Item_People item_People = new Item_People(messInfo.getUserSource());
 
-			item_People.addMouseListener(new MouseAdapter() {
+		item_People.addMouseListener(new MouseAdapter() {
 
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					// TODO Auto-generated method stub
-					body.clearChat();
-					for (ListMessChat listMessChat : listUserChat) {
-						if (listMessChat.getUsername().equals(messInfo.getUserSource())) {
-
-							chat_Title.setUserName(messInfo.getUserSource());
-							chat_Title.setUserDes(messInfo.getUserSource());
-
-							ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
-
-							for (MessInfo mess : listMess.getListMessInfo()) {
-								if (username.equals(mess.getUserSource())) {
-									body.addItemRight(mess.getMessContent(), mess.getTime(), mess);
-								} else {
-									body.addItemLeft(mess.getMessContent(), mess.getTime(), mess);
-								}
-							}
-
-							break;
-						}
-					}
-					body.revalidate();
-				}
-			});
-
-			for (ListMessChat listMessChat : listUserChat) {
-				if (listMessChat.getUsername().equals(messInfo.getUserSource())) {
-
-					ListMessChat listMessChatTmp = listMessChat;
-					listMessChatTmp.setMessLast(messInfo.getMessContent());
-					listMessChatTmp.getListMessInfo().add(messInfo);
-
-					listUserChat.remove(listUserChat.indexOf(listMessChat));
-					listUserChat.add(0, listMessChatTmp);
-
-					isUserTrue = true;
-					break;
-				}
-			}
-			if (!isUserTrue) {
-				ListMessChat list = new ListMessChat(messInfo.getUserSource(), messInfo.getMessContent(), item_People);
-				list.getListMessInfo().add(messInfo);
-				listUserChat.add(0, list);
-			}
-
-			if (messInfo.getUserSource().equals(chat_Title.getUserDes())) {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				body.clearChat();
 				for (ListMessChat listMessChat : listUserChat) {
+					if (listMessChat.getUsername().equals(messInfo.getUserSource())) {
 
-					if (listMessChat.getUsername().equals(chat_Title.getUserDes())) {
-						body.clearChat();
+						chat_Title.setUserName(messInfo.getUserSource());
+						chat_Title.setUserDes(messInfo.getUserSource());
+
 						ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
 
 						for (MessInfo mess : listMess.getListMessInfo()) {
@@ -173,21 +133,55 @@ public class TCPClient {
 								body.addItemLeft(mess.getMessContent(), mess.getTime(), mess);
 							}
 						}
-						body.revalidate();
+
 						break;
 					}
 				}
+				body.revalidate();
 			}
+		});
 
-			menu_Left.updateListChat(listUserChat);
+		for (ListMessChat listMessChat : listUserChat) {
+			if (listMessChat.getUsername().equals(messInfo.getUserSource())) {
 
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(loginView.getFrame(), "Connect Server Failed", "Alert",
-					JOptionPane.DEFAULT_OPTION);
-			System.exit(0);
+				ListMessChat listMessChatTmp = listMessChat;
+				listMessChatTmp.setMessLast(messInfo.getMessContent());
+				listMessChatTmp.getListMessInfo().add(messInfo);
+
+				listUserChat.remove(listUserChat.indexOf(listMessChat));
+				listUserChat.add(0, listMessChatTmp);
+
+				isUserTrue = true;
+				break;
+			}
 		}
+		if (!isUserTrue) {
+			ListMessChat list = new ListMessChat(messInfo.getUserSource(), messInfo.getMessContent(), item_People);
+			list.getListMessInfo().add(messInfo);
+			listUserChat.add(0, list);
+		}
+
+		if (messInfo.getUserSource().equals(chat_Title.getUserDes())) {
+			for (ListMessChat listMessChat : listUserChat) {
+
+				if (listMessChat.getUsername().equals(chat_Title.getUserDes())) {
+					body.clearChat();
+					ListMessChat listMess = listUserChat.get(listUserChat.indexOf(listMessChat));
+
+					for (MessInfo mess : listMess.getListMessInfo()) {
+						if (username.equals(mess.getUserSource())) {
+							body.addItemRight(mess.getMessContent(), mess.getTime(), mess);
+						} else {
+							body.addItemLeft(mess.getMessContent(), mess.getTime(), mess);
+						}
+					}
+					body.revalidate();
+					break;
+				}
+			}
+		}
+
+		menu_Left.updateListChat(listUserChat);
 
 	}
 

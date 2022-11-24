@@ -225,15 +225,22 @@ public class ServerGuiView extends JFrame {
 		JButton btnKick = new JButton("Kick");
 		btnKick.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// get thong tin cot name
-				int col = 0;
-				int row = tableUserLogin.getSelectedRow();
-				String username = (String) tableUserLogin.getModel().getValueAt(row, col);
-				// get thong tin cot status
-				col = 1;
-				row = tableUserLogin.getSelectedRow();
-				String status = (String) tableUserLogin.getModel().getValueAt(row, col);
-				PublicEvent.getInstance().getEventServer().KickUser(username, status);
+				try {
+					// get thong tin cot name
+					int col = 0;
+					int row = tableUserLogin.getSelectedRow();
+					String username = (String) tableUserLogin.getModel().getValueAt(row, col);
+					// get thong tin cot status
+					col = 1;
+					row = tableUserLogin.getSelectedRow();
+					String status = (String) tableUserLogin.getModel().getValueAt(row, col);
+					PublicEvent.getInstance().getEventServer().KickUser(username, status);
+				} catch (Exception ex) {
+					// TODO: handle exception
+					JOptionPane.showMessageDialog(getContentPane(), "Please select user in table", "Alert",
+							JOptionPane.WARNING_MESSAGE);
+					
+				}
 			}
 		});
 		btnKick.setBounds(272, 99, 137, 25);

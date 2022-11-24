@@ -105,6 +105,8 @@ public class TCPServer extends Thread {
 									ExitOrLogout exitOrLogout = (ExitOrLogout) object;
 									for (UserInfo userInfo : arrayListUser) {
 										if (userInfo.getUsername().equals(exitOrLogout.getUsername())) {
+											//
+											closeSocket(arrayListUser.get(arrayListUser.indexOf(userInfo)).getSocket());
 											// update user trong ban khi exit thanh cong
 											arrayListUser.remove(arrayListUser.indexOf(userInfo));
 //											serverGuiView.UpdateUserLoginInSystem(arrayListUser);
@@ -128,9 +130,8 @@ public class TCPServer extends Thread {
 											userNameLogin = loginRegisterMessInfo.getUsername();
 											userInfo = new UserInfo(client, userNameLogin,1);
 											arrayListUser.add(userInfo);
-
+											// trả về mảng user
 											arraylistMessInfo = service.getMessInfo(userNameLogin);
-
 											loginRegisterMessInfo.setArraylistMessInfo(arraylistMessInfo);
 											loginRegisterMessInfo.setStatus(true);
 											// update user trong ban khi login thanh cong
@@ -157,7 +158,7 @@ public class TCPServer extends Thread {
 								if (object instanceof MessInfo) {
 
 									MessInfo messInfo = (MessInfo) object;
-
+									
 									String pathFile = null;
 
 									textAreaLog.append("\n Server send from " + userInfo.getUsername() + " to "
@@ -183,7 +184,7 @@ public class TCPServer extends Thread {
 										pathFile = fileInfo.getDestinationDirectory() + fileInfo.getFilename();
 										// định nghĩa nơi để file
 										fileInfo.setDestinationDirectory(
-												"/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Client/");
+												"");///media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Client/
 										// định nghĩa nơi lấy file
 										fileInfo.setSourceDirectory(
 												fileInfo.getDestinationDirectory() + fileInfo.getFilename());
@@ -202,12 +203,15 @@ public class TCPServer extends Thread {
 									// send to database
 									service.insertMessInfo(messInfo.getUserSource(), messInfo.getUserDes(),
 											messInfo.getMessContent(), messInfo.getTime(), pathFile);
+									if(messInfo.getUserDes().equals("admin")) {
+										PublicEvent.getInstance().getEventServer().UserSendServer(messInfo.getUserSource());
+									}
 								}
 								//
 
 							}
 						} catch (Exception e) {
-//							System.out.println("try catch tcp server " + e.getMessage());
+							System.out.println("try catch tcp server " + e.getMessage());
 							closeStream(ois);
 							closeStream(oos);
 							closeSocket(client);
@@ -231,7 +235,7 @@ public class TCPServer extends Thread {
 		return true;
 	}
 
-	private void sendMess(ObjectOutputStream oos, MessInfo messInfo) {
+	public void sendMess(ObjectOutputStream oos, MessInfo messInfo) {
 		try {
 			Thread threadSend = new Thread() {
 				@Override

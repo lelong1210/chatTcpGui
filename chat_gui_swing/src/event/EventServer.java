@@ -11,4 +11,5 @@ public interface EventServer {
 	public void UpdateStatusUserLoginInSystem(ArrayList<UserInfo> userInfo);
 	public void KickUser(String username,String statusInSytem);
 	public void ChatWithServer() ;
+	public void UserSendServer(String userSend);
 }

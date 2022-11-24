@@ -60,10 +60,10 @@ public class Service {
 
 			prst = conn.prepareStatement(getUser);
 			ResultSet rst = prst.executeQuery();
-			
+
 			while (rst.next()) {
-				UserInfo userInfo = new UserInfo(null, rst.getString(1),rst.getInt(2));
-				vUser.add(userInfo);				
+				UserInfo userInfo = new UserInfo(null, rst.getString(1), rst.getInt(2));
+				vUser.add(userInfo);
 			}
 			return vUser;
 
@@ -83,6 +83,42 @@ public class Service {
 			String Login = "SELECT id, userSource, userDes, messContent, time, file FROM messInfo WHERE messInfo.userDes = ? OR messInfo.userSource = ?";
 
 			prst = conn.prepareStatement(Login);
+			prst.setString(1, username);
+			prst.setString(2, username);
+			ResultSet rst = prst.executeQuery();
+			ResultSetMetaData rstm = rst.getMetaData();
+			while (rst.next()) {
+				MessInfo messInfo = new MessInfo(rst.getString(2), rst.getString(3), rst.getString(4), rst.getString(5),
+						null);
+				vData.add(messInfo);
+
+				if (rst.getString(6) != null) {
+					FileInfo fileInfo = getFileInfo(rst.getString(6), "");
+					messInfo.setFileInfo(fileInfo);
+				}
+			}
+
+			return vData;
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return vData;
+	}
+
+	public ArrayList<MessInfo> getMessInfoOfServer(String username) {
+
+		try {
+			if (vData != null) {
+				vData.clear();
+				vTitle.clear();
+			}
+
+			String sql = "SELECT id, userSource, userDes, messContent, time, file FROM messInfo WHERE " 
+					+ "((messInfo.userSource='admin' AND messInfo.userDes =?) OR "
+					+ "(messInfo.userSource=? AND messInfo.userDes ='admin'))";
+
+			prst = conn.prepareStatement(sql);
 			prst.setString(1, username);
 			prst.setString(2, username);
 			ResultSet rst = prst.executeQuery();
