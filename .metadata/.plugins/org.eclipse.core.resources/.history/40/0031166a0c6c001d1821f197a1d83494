@@ -217,7 +217,7 @@ public class LoginView {
 		lblNewLabel_1.setBounds(12, 143, 70, 15);
 		panel_Register.add(lblNewLabel_1);
 		
-		text_enter_pass = new JPasswordField();
+		text_enter_pass = new JTextField();
 		text_enter_pass.setBounds(158, 141, 154, 30);
 		panel_Register.add(text_enter_pass);
 		text_enter_pass.setColumns(10);
@@ -266,7 +266,7 @@ public class LoginView {
 		lblNewLabel_2.setBounds(12, 184, 104, 15);
 		panel_Register.add(lblNewLabel_2);
 		
-		text_re_enter_pass = new JPasswordField();
+		text_re_enter_pass = new JTextField();
 		text_re_enter_pass.setBounds(158, 182, 154, 30);
 		panel_Register.add(text_re_enter_pass);
 		text_re_enter_pass.setColumns(10);
