@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="java.lang.Runnable"/>
     <fullyQualifiedTypeName name="javax.swing.JLabel"/>
     <fullyQualifiedTypeName name="guiCore.Menu_Left"/>
     <fullyQualifiedTypeName name="java.lang.reflect.Array"/>
@@ -33,7 +32,6 @@
     <fullyQualifiedTypeName name="core.LoginRegisterMessInfo"/>
     <fullyQualifiedTypeName name="java.awt.TextField"/>
     <fullyQualifiedTypeName name="javax.swing.JTextField"/>
-    <fullyQualifiedTypeName name="core.FileInfo"/>
     <fullyQualifiedTypeName name="java.io.File"/>
     <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
     <fullyQualifiedTypeName name="event.EventExit"/>
@@ -58,6 +56,8 @@
     <fullyQualifiedTypeName name="core.MessInfo"/>
     <fullyQualifiedTypeName name="chat_gui.Chat_Bottom"/>
     <fullyQualifiedTypeName name="chat_gui.Chat_Body"/>
-    <fullyQualifiedTypeName name="event.PublicEvent"/>
     <fullyQualifiedTypeName name="java.lang.Exception"/>
+    <fullyQualifiedTypeName name="core.FileInfo"/>
+    <fullyQualifiedTypeName name="event.PublicEvent"/>
+    <fullyQualifiedTypeName name="javax.management.openmbean.OpenDataException"/>
 </qualifiedTypeNameHistroy>
