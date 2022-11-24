@@ -154,7 +154,7 @@ public class ServerGuiView extends JFrame {
 		JButton btnUpdateUser = new JButton("Update");
 		btnUpdateUser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				PublicEvent.getInstance().getEventServer().UpdateUser(txtUsername.getText(), txtComboBoxStatus.getSelectedIndex());
 			}
 		});
 		btnUpdateUser.setBounds(153, 99, 117, 25);

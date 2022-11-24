@@ -50,6 +50,21 @@ public class Service {
 		return false;
 	}
 
+	public boolean updateUser(String username, int status) {
+		String sql = "UPDATE user SET status = ? WHERE user.username = ?";
+		try {
+			prst = conn.prepareStatement(sql);
+			prst.setInt(1, status);
+			prst.setString(2, username);
+			if (prst.executeUpdate() != 0) {
+				return true;
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
+	}
+
 	public ArrayList<UserInfo> getListUser() {
 		try {
 			if (vUser != null) {
@@ -114,7 +129,7 @@ public class Service {
 				vTitle.clear();
 			}
 
-			String sql = "SELECT id, userSource, userDes, messContent, time, file FROM messInfo WHERE " 
+			String sql = "SELECT id, userSource, userDes, messContent, time, file FROM messInfo WHERE "
 					+ "((messInfo.userSource='admin' AND messInfo.userDes =?) OR "
 					+ "(messInfo.userSource=? AND messInfo.userDes ='admin'))";
 

@@ -60,13 +60,46 @@ public class Controller implements ActionListener {
 			@Override
 			public void UpdateUser(String username, int option) {
 				// TODO Auto-generated method stub
-
+				try {
+					System.out.println("username "+username+" option "+option);
+					tcpServer.getService().updateUser(username, option);
+					
+					// getuser tu database va ve lai bang
+					arrayListUserDatabaseToGUI = tcpServer.getService().getListUser();
+					view.UpdateUserLoginInSystem(arrayListUserDatabaseToGUI, tcpServer.getArrayListUser());
+					
+					// kick user
+					if(option == 0) {
+						for (UserInfo userInfo : tcpServer.getArrayListUser()) {
+							if (username.equals(userInfo.getUsername())) {
+								userInfo.getSocket().close();
+								tcpServer.getArrayListUser().remove(tcpServer.getArrayListUser().indexOf(userInfo));
+								view.UpdateUserLoginInSystem(arrayListUserDatabaseToGUI, tcpServer.getArrayListUser());
+								view.getTxtUsername().setText("");
+								view.getTxtComboBoxStatus().setSelectedIndex(0);
+							}
+						}
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 			}
 
 			@Override
 			public void Adduser(String username, String Password) {
 				// TODO Auto-generated method stub
-				System.out.println("User In system " + tcpServer.getArrayListUser().toString());
+				if(tcpServer.getService().Register(username, Password)) {
+					JOptionPane.showMessageDialog(view.getContentPane(), "Add User Success", "Alert",
+							JOptionPane.WARNING_MESSAGE);
+					
+					// getuser tu database va ve lai bang
+					arrayListUserDatabaseToGUI = tcpServer.getService().getListUser();
+					view.UpdateUserLoginInSystem(arrayListUserDatabaseToGUI, tcpServer.getArrayListUser());
+					
+				}else {
+					JOptionPane.showMessageDialog(view.getContentPane(), "Add User Failed", "Alert",
+							JOptionPane.WARNING_MESSAGE);
+				}
 			}
 
 			@Override
@@ -131,16 +164,31 @@ public class Controller implements ActionListener {
 		PublicEvent.getInstance().addEventChat(new EventChat() {
 			@Override
 			public void sendMessage(String text) {
-				DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-				LocalDateTime now = LocalDateTime.now();
-				String time = dtf.format(now);
 				try {
+					String pathFile = null;
+					
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					LocalDateTime now = LocalDateTime.now();
+					String time = dtf.format(now);
+					
+					MessInfo messInfo = new MessInfo("admin", view.getTxtUsername().getText(), text, time,null);
+					
+					// create MessInfo
+					if(isSendFile) {
+						FileInfo fileInfo = tcpServer.getFileInfo(text, "/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/");
+						tcpServer.createFile(fileInfo);
+						messInfo.setFileInfo(fileInfo);
+						messInfo.getFileInfo().setSourceDirectory(messInfo.getFileInfo().getDestinationDirectory());
+						pathFile = fileInfo.getDestinationDirectory() + fileInfo.getFilename();
+						
+					}
+				 
+					// find user send
 					for (UserInfo userInfo : tcpServer.getArrayListUser()) {
 
 						if (userInfo.getUsername().equals(view.getTxtUsername().getText())) {
 
-							MessInfo messInfo = new MessInfo("admin", view.getTxtUsername().getText(), text, time,
-									null);
+							
 							ObjectOutputStream oos = new ObjectOutputStream(userInfo.getSocket().getOutputStream());
 							tcpServer.sendMess(oos, messInfo);
 							oos = null;
@@ -148,10 +196,14 @@ public class Controller implements ActionListener {
 						}
 
 					}
-					tcpServer.getService().insertMessInfo("admin", view.getTxtUsername().getText(), text, time, null);
+					// insert database
+					tcpServer.getService().insertMessInfo("admin", view.getTxtUsername().getText(), text, time, pathFile);
+					// re paint
 					paintMessServerWhenClick(
 							tcpServer.getService().getMessInfoOfServer(view.getTxtUsername().getText()),
 							viewSub.getHome().getChat().getChatBody());
+					
+					isSendFile=false;
 				} catch (Exception e) {
 					// TODO: handle exception
 				}

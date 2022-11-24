@@ -1,8 +1,10 @@
 package server;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,7 @@ import event.PublicEvent;
 // class này là nhân của server
 public class TCPServer extends Thread {
 	private Service service;
+
 	public Service getService() {
 		return service;
 	}
@@ -48,8 +51,6 @@ public class TCPServer extends Thread {
 	private ArrayList<UserInfo> arrayListUser = new ArrayList<UserInfo>();
 	// mang user in database
 
-
-
 	public ArrayList<UserInfo> getArrayListUser() {
 		return arrayListUser;
 	}
@@ -63,7 +64,6 @@ public class TCPServer extends Thread {
 		this.port = port;
 		this.service = new Service();
 		this.textAreaLog = textAreaLog;
-		
 
 	}
 
@@ -110,7 +110,8 @@ public class TCPServer extends Thread {
 											// update user trong ban khi exit thanh cong
 											arrayListUser.remove(arrayListUser.indexOf(userInfo));
 //											serverGuiView.UpdateUserLoginInSystem(arrayListUser);
-											PublicEvent.getInstance().getEventServer().UpdateStatusUserLoginInSystem(arrayListUser);
+											PublicEvent.getInstance().getEventServer()
+													.UpdateStatusUserLoginInSystem(arrayListUser);
 										}
 									}
 								}
@@ -128,19 +129,20 @@ public class TCPServer extends Thread {
 												loginRegisterMessInfo.getPassword())
 												&& checkUserLogin(loginRegisterMessInfo.getUsername())) {
 											userNameLogin = loginRegisterMessInfo.getUsername();
-											userInfo = new UserInfo(client, userNameLogin,1);
+											userInfo = new UserInfo(client, userNameLogin, 1);
 											arrayListUser.add(userInfo);
 											// trả về mảng user
 											arraylistMessInfo = service.getMessInfo(userNameLogin);
 											loginRegisterMessInfo.setArraylistMessInfo(arraylistMessInfo);
 											loginRegisterMessInfo.setStatus(true);
 											// update user trong ban khi login thanh cong
-											PublicEvent.getInstance().getEventServer().UpdateStatusUserLoginInSystem(arrayListUser);
+											PublicEvent.getInstance().getEventServer()
+													.UpdateStatusUserLoginInSystem(arrayListUser);
 
 										} else {
 											loginRegisterMessInfo.setStatus(false);
 										}
-									// option is register
+										// option is register
 									} else {
 										if (service.Register(loginRegisterMessInfo.getUsername(),
 												loginRegisterMessInfo.getPassword())) {
@@ -158,7 +160,7 @@ public class TCPServer extends Thread {
 								if (object instanceof MessInfo) {
 
 									MessInfo messInfo = (MessInfo) object;
-									
+
 									String pathFile = null;
 
 									textAreaLog.append("\n Server send from " + userInfo.getUsername() + " to "
@@ -183,8 +185,7 @@ public class TCPServer extends Thread {
 										// get path
 										pathFile = fileInfo.getDestinationDirectory() + fileInfo.getFilename();
 										// định nghĩa nơi để file
-										fileInfo.setDestinationDirectory(
-												"");///media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Client/
+										fileInfo.setDestinationDirectory("");/// media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Client/
 										// định nghĩa nơi lấy file
 										fileInfo.setSourceDirectory(
 												fileInfo.getDestinationDirectory() + fileInfo.getFilename());
@@ -203,8 +204,10 @@ public class TCPServer extends Thread {
 									// send to database
 									service.insertMessInfo(messInfo.getUserSource(), messInfo.getUserDes(),
 											messInfo.getMessContent(), messInfo.getTime(), pathFile);
-									if(messInfo.getUserDes().equals("admin")) {
-										PublicEvent.getInstance().getEventServer().UserSendServer(messInfo.getUserSource());
+									
+									if (messInfo.getUserDes().equals("admin")) {
+										PublicEvent.getInstance().getEventServer()
+												.UserSendServer(messInfo.getUserSource());
 									}
 								}
 								//
@@ -277,7 +280,7 @@ public class TCPServer extends Thread {
 		}
 	}
 
-	private boolean createFile(FileInfo fileInfo) {
+	public boolean createFile(FileInfo fileInfo) {
 		BufferedOutputStream bos = null;
 		try {
 			if (fileInfo != null) {
@@ -295,6 +298,28 @@ public class TCPServer extends Thread {
 			closeStream(bos);
 		}
 		return true;
+	}
+
+	public FileInfo getFileInfo(String sourceFilePath, String destinationDir) {
+		FileInfo fileInfo = null;
+		BufferedInputStream bis = null;
+		try {
+			File sourceFile = new File(sourceFilePath);
+			bis = new BufferedInputStream(new FileInputStream(sourceFile));
+			fileInfo = new FileInfo();
+			byte[] fileBytes = new byte[(int) sourceFile.length()];
+			// get file info
+			bis.read(fileBytes, 0, fileBytes.length);
+			fileInfo.setFilename(sourceFile.getName());
+			fileInfo.setDataBytes(fileBytes);
+			fileInfo.setDestinationDirectory(destinationDir);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			closeStream(bis);
+		}
+
+		return fileInfo;
 	}
 
 	public void closeSocket(Socket socket) {
