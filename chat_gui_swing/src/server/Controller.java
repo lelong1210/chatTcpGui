@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import chat_gui.Chat_Body;
@@ -146,6 +148,7 @@ public class Controller implements ActionListener {
 			public void ChatWithServer() {
 				// SHOW US SOME MESSAGE
 				viewSub.setVisible(true);
+				viewSub.getHome().getChat().getChatTitle().setUserName(view.getTxtUsername().getText());
 				viewSub.getHome().getChat().getChatBody().clearChat();
 				paintMessServerWhenClick(tcpServer.getService().getMessInfoOfServer(view.getTxtUsername().getText()),
 						viewSub.getHome().getChat().getChatBody());
@@ -177,8 +180,16 @@ public class Controller implements ActionListener {
 					
 					// create MessInfo
 					if(isSendFile) {
+						// tạo giờ để k trùng lặp file name
+						DateTimeFormatter dtfFilename = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+						LocalDateTime nowFilename = LocalDateTime.now();
+						String nameExtend = dtfFilename.format(nowFilename);
+						// get file
 						FileInfo fileInfo = tcpServer.getFileInfo(text, "/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/");
-						tcpServer.createFile(fileInfo);
+						// rename file 
+						fileInfo.setFilename(nameExtend+fileInfo.getFilename());
+						// create file
+						tcpServer.createFile(fileInfo,0);
 						messInfo.setFileInfo(fileInfo);
 						messInfo.getFileInfo().setSourceDirectory(messInfo.getFileInfo().getDestinationDirectory());
 						pathFile = fileInfo.getDestinationDirectory() + fileInfo.getFilename();
@@ -226,8 +237,18 @@ public class Controller implements ActionListener {
 
 			@Override
 			public void downloadFile(FileInfo fileInfo) {
-				// TODO Auto-generated method stub
-
+				// tạo giờ để k trùng lặp file name
+				DateTimeFormatter dtfFilename = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+				LocalDateTime nowFilename = LocalDateTime.now();
+				String nameExtend = dtfFilename.format(nowFilename);
+				
+				// rename file 
+				fileInfo.setFilename(nameExtend+fileInfo.getFilename());
+				
+				System.out.println("Download file :" + fileInfo.getFilename());
+				String downloadFileIn = viewSub.chooseFolder(fileInfo.getFilename());
+				fileInfo.setDestinationDirectory(downloadFileIn+"/");
+				tcpServer.createFile(fileInfo,1);
 			}
 		});
 		PublicEvent.getInstance().addeventExitOrLogout(new EventExitOrLogout() {
@@ -263,4 +284,5 @@ public class Controller implements ActionListener {
 			// TODO: handle exception
 		}
 	}
+	
 }

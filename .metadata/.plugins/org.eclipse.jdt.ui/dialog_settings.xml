@@ -56,12 +56,14 @@
 		<item key="FatJarPackageWizardPage.ANTSCRIPT_SAVE" value="false"/>
 		<item key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION" value="/media/lql/HDD/Code/Code_Java/Code_Chat_GUI"/>
 		<item key="FatJarPackageWizardPage.LIBRARY_HANDLING" value="1"/>
-		<item key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME" value="RunMain - chat_gui_swing"/>
-		<item key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION" value="/home/lql/Downloads/Untitled.jar"/>
+		<item key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME" value="RunMainClient - chat_gui_swing"/>
+		<item key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION" value="/home/lql/Desktop/cient.jar"/>
 		<list key="FatJarPackageWizardPage.DESTINATION_NAMES_ID">
+			<item value="/home/lql/Desktop/cient.jar"/>
 			<item value="/home/lql/Downloads/Untitled.jar"/>
 		</list>
 		<list key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION_HISTORY">
+			<item value="/media/lql/HDD/Code/Code_Java/Code_Chat_GUI.xml"/>
 			<item value=".xml"/>
 		</list>
 	</section>

@@ -181,7 +181,7 @@ public class TCPServer extends Thread {
 										// khởi tạo file
 										FileInfo fileInfo = (FileInfo) messInfo.getFileInfo();
 										// tạo file
-										createFile(fileInfo);
+										createFile(fileInfo,0);
 										// get path
 										pathFile = fileInfo.getDestinationDirectory() + fileInfo.getFilename();
 										// định nghĩa nơi để file
@@ -280,9 +280,11 @@ public class TCPServer extends Thread {
 		}
 	}
 
-	public boolean createFile(FileInfo fileInfo) {
-		
-		fileInfo.setDestinationDirectory("/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/");
+	public boolean createFile(FileInfo fileInfo,int option) {
+		// 0 là tự tạo 1 là server muốn chọn nơi lưu (đã có nơi lưu)
+		if(option==0) {
+			fileInfo.setDestinationDirectory("/media/lql/HDD/Code/Code_Java/Code_Chat_GUI/Server/");
+		}
 		
 		BufferedOutputStream bos = null;
 		try {
